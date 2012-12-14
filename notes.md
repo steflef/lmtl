@@ -144,6 +144,7 @@ Référence complète -> [GeoJSON](http://en.wikipedia.org/wiki/GeoJSON)
 * [GitHub API -> Changes Warning](http://developer.github.com/)
 * [Integrate Desk](http://dev.desk.com/)
 * [Knight Fondation](http://newschallenge.tumblr.com/)
+* [blightStatu](http://www.blightstatus.com/), le portail et le site de [New Orleans](http://blightstatus.nola.gov/).
 
 
 ### Frameworks RESTful PHP considérés
@@ -269,50 +270,6 @@ Liste:
 		* **Niveau 3** - Lieu, descriptif  
 *ex.:{id:1, nom:'csdm', desc:'desc', count:322, data:[{},{},{}…]}*
 	
-### Format
-En fonction du budget annuel de maintenance, des technologies disponibles ou sélectionnées et des possibilités en termes de requêtes.
-
-### NoSQL
-Un entrepôt de données CouchDB couplé à un moteur de recherche ElasticSearch. C'est ElasticSearch qui sera en charge des requêtes spatiales. Ou encore utiliser directement MongoDB pour tout.
-
-Bonus:
-
-* Tout est en JSON, donc un seul format pour l'entreposage et le questionnament des entrepôts de données;
-* Aucune structure de données imposée;
-
-Malus:
-
-* Incompatible avec le serveur actuel;
-* Requêtes spatiales limitées par ElasticSearch
-
-### Postgres + PostGIS SQL
-Tout est entreposé dans Postgres.
-
-Bonus:
-
-* Structure formelle des données;
-* Requêtes spatiales complexes possibles;
-* Possibilité d'utiliser cette BD pour centraliser les données de l'Atlas (lecture/écriture via applications GIS);
-
-Malus:
-
-* Structure formelle des données;
-* Incompatible avec le serveur actuel;
-
-### MySQL SQL
-
-Tout est entreposé dans MySQL.
-
-Bonus:
-
-* Structure formelle des données;
-* Compatible avec le serveur actuel;
-* Requêtes spatiales possibles en fonction de la version et du mode de compilation effectuée par iWeb;
-
-Malus:
-
-* Structure formelle des données;
-* Spatialement plus faible que PostGIS;
 
 # Front End Utilisateur
 
