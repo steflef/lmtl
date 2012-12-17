@@ -1,2 +1,13 @@
 # PHPStorm project
 *.idea
+
+# Docs
+/docs
+
+# Ext
+/ext/Mustache/
+/ext/Slim/
+/ext/cssmin/
+/ext/htmlpuifier/
+/ext/jsmin/
+/ext/propel/

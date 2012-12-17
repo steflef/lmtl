@@ -54,7 +54,8 @@
 * [**Fulcrum API**](http://developer.fulcrumapp.com/api/fulcrum-api.html)*, exposes access to your data & pictures, form elements, account setup info and more through our RESTful API*. Voir aussi les applications [Fulcrum](http://fulcrumapp.com/), *cloud-based data collection*.
 * [**Google Places**](http://www.google.com/places/) et l'[**API Places**](https://developers.google.com/places/documentation/), application Google utilisée pour alimenter Google Maps. Peut être questionnée directement via API. Liste des lieux supportés par l'API -> [lieux](https://developers.google.com/places/documentation/supported_types).
 * [**OpenStreetMap's free tagging system**](http://wiki.openstreetmap.org/wiki/Map_Features) allows the map to contain unlimited data about its elements, like roads and buildings. The community agrees on certain key and value combinations for tags that are informal standards, allowing us to improve the style of the map and do analysis that relies on the attributes of features. [Tags](http://wiki.openstreetmap.org/wiki/Tags). [Category:Features](http://wiki.openstreetmap.org/wiki/Category:Features). [Amenity](http://wiki.openstreetmap.org/wiki/Map_Features#Amenity).
-
+* [**GitHub API**](http://developer.github.com/v3/).
+* [Designing Great API](http://blog.parse.com/2012/01/11/designing-great-api-docs/).
 
 * [PHP The Right Way](http://www.phptherightway.com/). Conventions pour le code PHP.
 * [PHPDocumentor](http://phpdoc.org/). Documentation automatique du code source PHP.
