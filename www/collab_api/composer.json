@@ -1,0 +1,25 @@
+{
+    "name": "LMTL Collab App",
+    "description": "An app to upload collections, datasets & points",
+    "keywords": [
+        "places",
+        "map",
+        "montreal"
+    ],
+    "homepage": "http://github.com/steflef/lmtl",
+    "license": "MIT",
+    "authors": [
+    {
+        "name": "Stef Lef",
+        "email": "info@steflef.com",
+        "homepage": "http://www.steflef.com/"
+}
+],
+    "require":{
+        "slim/slim": "2.*",
+        "slim/extras": "2.*",
+        "codeguy/upload": "*",
+        "mustache/mustache": "dev-dev",
+        "twitter/bootstrap": "dev-2.3.0-wip"
+    }
+}
