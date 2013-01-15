@@ -278,24 +278,4 @@ Liste:
 *ex.:{id:1, nom:'csdm', desc:'desc', count:322, data:[{},{},{}…]}*
 	
 
-# Front End Utilisateur
-
-
-## Technologies
-
-### Javascript
-
-* Angular.js
-* Leaflet.js
-
-### Style
-* Twitter Bootstrap
-* Leaflet
-
-## BACK END Serveur
-
-Apache 2
-PHP 5.3 +
-PostgreSQL + PostGIS + hstore
-
 
