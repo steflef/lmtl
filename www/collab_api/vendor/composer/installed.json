@@ -143,29 +143,26 @@
         ]
     },
     {
-        "name": "mustache/mustache",
-        "version": "dev-dev",
-        "version_normalized": "dev-dev",
+        "name": "psr/log",
+        "version": "1.0.0",
+        "version_normalized": "1.0.0.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/bobthecow/mustache.php",
-            "reference": "5e69e63ffb82c90d7e2d4dad6495b620b2973576"
+            "url": "https://github.com/php-fig/log",
+            "reference": "1.0.0"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/bobthecow/mustache.php/archive/5e69e63ffb82c90d7e2d4dad6495b620b2973576.zip",
-            "reference": "5e69e63ffb82c90d7e2d4dad6495b620b2973576",
+            "url": "https://github.com/php-fig/log/archive/1.0.0.zip",
+            "reference": "1.0.0",
             "shasum": ""
         },
-        "require": {
-            "php": ">=5.2.4"
-        },
-        "time": "2013-01-12 17:22:59",
+        "time": "2012-12-21 11:40:51",
         "type": "library",
-        "installation-source": "source",
+        "installation-source": "dist",
         "autoload": {
             "psr-0": {
-                "Mustache": "src/"
+                "Psr\\Log\\": ""
             }
         },
         "notification-url": "https://packagist.org/downloads/",
@@ -174,34 +171,946 @@
         ],
         "authors": [
             {
-                "name": "Justin Hileman",
-                "email": "justin@justinhileman.info",
-                "homepage": "http://justinhileman.com"
+                "name": "PHP-FIG",
+                "homepage": "http://www.php-fig.org/"
             }
         ],
-        "description": "A Mustache implementation in PHP.",
-        "homepage": "https://github.com/bobthecow/mustache.php",
+        "description": "Common interface for logging libraries",
         "keywords": [
-            "templating",
-            "mustache"
+            "log",
+            "psr",
+            "psr-3"
+        ]
+    },
+    {
+        "name": "aura/installer-default",
+        "version": "1.0.0",
+        "version_normalized": "1.0.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/auraphp/installer-default",
+            "reference": "1.0.0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/auraphp/installer-default/archive/1.0.0.zip",
+            "reference": "1.0.0",
+            "shasum": ""
+        },
+        "time": "2012-11-26 21:35:57",
+        "type": "composer-installer",
+        "extra": {
+            "class": "Aura\\Composer\\DefaultInstaller"
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Aura\\Composer\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-2-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Paul M. Jones",
+                "email": "pmjones88@gmail.com",
+                "homepage": "http://paul-m-jones.com"
+            }
+        ],
+        "description": "Installs Aura packages using the Composer defaults.",
+        "keywords": [
+            "installer",
+            "aura"
+        ]
+    },
+    {
+        "name": "monolog/monolog",
+        "version": "1.3.1",
+        "version_normalized": "1.3.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Seldaek/monolog",
+            "reference": "1.3.1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/Seldaek/monolog/archive/1.3.1.zip",
+            "reference": "1.3.1",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0",
+            "psr/log": ">=1.0,<2.0"
+        },
+        "require-dev": {
+            "mlehner/gelf-php": "1.0.*",
+            "raven/raven": "0.3.*",
+            "doctrine/couchdb": "dev-master"
+        },
+        "suggest": {
+            "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server",
+            "raven/raven": "Allow sending log messages to a Sentry server",
+            "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
+            "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
+            "ext-mongo": "Allow sending log messages to a MongoDB server"
+        },
+        "time": "2013-01-11 10:23:20",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.3.x-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Monolog": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jordi Boggiano",
+                "email": "j.boggiano@seld.be",
+                "homepage": "http://seld.be",
+                "role": "Developer"
+            }
+        ],
+        "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
+        "homepage": "http://github.com/Seldaek/monolog",
+        "keywords": [
+            "log",
+            "logging",
+            "psr-3"
+        ]
+    },
+    {
+        "name": "CodePlex/PHPExcel",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/markushausammann/PHPExcel",
+            "reference": "9829bb66286e2b2c55b0dbdb4720b64794dacb87"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/markushausammann/PHPExcel/archive/9829bb66286e2b2c55b0dbdb4720b64794dacb87.zip",
+            "reference": "9829bb66286e2b2c55b0dbdb4720b64794dacb87",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.0",
+            "ext-xml": "*"
+        },
+        "time": "2012-11-21 11:08:49",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "PHPExcel": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL"
+        ],
+        "authors": [
+            {
+                "name": "Maarten Balliauw",
+                "homepage": "http://blog.maartenballiauw.be"
+            },
+            {
+                "name": "Mark Baker"
+            },
+            {
+                "name": "Erit Tilt"
+            }
+        ],
+        "description": "PHPExcel - OpenXML - Create Excel2007 documents in PHP - Spreadsheet engine",
+        "homepage": "http://phpexcel.codeplex.com",
+        "keywords": [
+            "php",
+            "excel",
+            "spreadsheet",
+            "OpenXML"
+        ]
+    },
+    {
+        "name": "noetix/easy-csv",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/noetix/EasyCSV",
+            "reference": "1d6fec0837c4dc7750ae0c49bb34c21296046454"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/noetix/EasyCSV/archive/1d6fec0837c4dc7750ae0c49bb34c21296046454.zip",
+            "reference": "1d6fec0837c4dc7750ae0c49bb34c21296046454",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2012-10-07 22:37:49",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "EasyCSV": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jonathan Wage",
+                "email": "jonwage@gmail.com",
+                "homepage": "http://www.jwage.com/"
+            },
+            {
+                "name": "Alex Joyce",
+                "email": "im@alex-joyce.com",
+                "homepage": "http://alex-joyce.com"
+            }
+        ],
+        "description": "Set of PHP 5.3 classes for reading and writing CSV files.",
+        "homepage": "https://github.com/noetix/EasyCSV",
+        "keywords": [
+            "csv"
+        ]
+    },
+    {
+        "name": "davidkuridza/php-bcrypt-wrapper",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/davidkuridza/php-bcrypt-wrapper",
+            "reference": "693f206375e6322c087576abf3fa49a24327f29a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/davidkuridza/php-bcrypt-wrapper/archive/693f206375e6322c087576abf3fa49a24327f29a.zip",
+            "reference": "693f206375e6322c087576abf3fa49a24327f29a",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": ">=3.7.10.0,<3.8"
+        },
+        "time": "2013-01-13 19:15:48",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "files": [
+                "Bcrypt/Bcrypt.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "David Kuridža",
+                "email": "david@kuridza.si"
+            }
+        ],
+        "description": "Simple PHP bcrypt wrapper",
+        "homepage": "https://github.com/davidkuridza/php-bcrypt-wrapper",
+        "keywords": [
+            "password",
+            "hash",
+            "bcrypt"
+        ]
+    },
+    {
+        "name": "alchemy/zippy",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/alchemy-fr/Zippy",
+            "reference": "4cd82bb73398171013a058705bce4aff2debd078"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/alchemy-fr/Zippy/archive/4cd82bb73398171013a058705bce4aff2debd078.zip",
+            "reference": "4cd82bb73398171013a058705bce4aff2debd078",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3",
+            "pimple/pimple": ">=1.0,<2.0",
+            "symfony/process": ">=2.0, <=2.2.x-dev"
+        },
+        "time": "2013-01-25 12:04:21",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "0.1.x-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Alchemy": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Phraseanet Team",
+                "email": "info@alchemy.fr",
+                "homepage": "http://www.phraseanet.com/"
+            }
+        ],
+        "description": "Zippy, the archive manager companion",
+        "keywords": [
+            "compression",
+            "zip",
+            "tar",
+            "bzip"
+        ]
+    },
+    {
+        "name": "zendframework/zendgdata",
+        "version": "2.0.1",
+        "version_normalized": "2.0.1.0",
+        "dist": {
+            "type": "zip",
+            "url": "http://packages.zendframework.com/composer/ZendGData-2.0.1.zip",
+            "reference": null,
+            "shasum": null
+        },
+        "require": {
+            "php": ">=5.3.3",
+            "zendframework/zend-http": ">=2.0.0",
+            "zendframework/zend-stdlib": ">=2.0.0",
+            "zendframework/zend-version": ">=2.0.0"
+        },
+        "require-dev": {
+            "zendframework/zend-i18n": ">=2.0.0"
+        },
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "ZendGData": "library/"
+            }
+        },
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "description": "provide programmatic interface to some of Google's online services",
+        "homepage": "http://packages.zendframework.com/",
+        "keywords": [
+            "zf2",
+            "gdata"
+        ],
+        "support": {
+            "email": "fw-general-subscribe@lists.zend.com",
+            "irc": "irc://irc.freenode.net/zftalk",
+            "issues": "https://github.com/zendframework/zf2/issues",
+            "source": "https://github.com/zendframework/zf2"
+        }
+    },
+    {
+        "name": "willdurand/geocoder",
+        "version": "1.2.1",
+        "version_normalized": "1.2.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/willdurand/Geocoder",
+            "reference": "1.2.1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/willdurand/Geocoder/zipball/1.2.1",
+            "reference": "1.2.1",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "kriswallsmith/buzz": "*",
+            "guzzle/guzzle": "*",
+            "zendframework/zend-http": "*"
+        },
+        "suggest": {
+            "kriswallsmith/buzz": "Enabling Buzz allows you to use the BuzzHttpAdapter.",
+            "ext-curl": "Enabling the curl extension allows you to use CurlHttpAdapter.",
+            "guzzle/guzzle": "Enabling Guzzle allows you to use the GuzzleHttpAdapter.",
+            "zendframework/zend-http": "Enabling Zend_Http allows you to use the ZendHttpAdapter."
+        },
+        "time": "2013-02-03 02:01:33",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.2-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Geocoder": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "William Durand",
+                "email": "william.durand1@gmail.com",
+                "homepage": "http://www.willdurand.fr"
+            }
+        ],
+        "description": "The almost missing Geocoder PHP 5.3 library.",
+        "homepage": "http://geocoder-php.org",
+        "keywords": [
+            "geocoding",
+            "abstraction",
+            "geocoder",
+            "geoip"
+        ]
+    },
+    {
+        "name": "aura/sql",
+        "version": "dev-develop",
+        "version_normalized": "dev-develop",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/auraphp/Aura.Sql.git",
+            "reference": "04eb3abc54634c0bbb502c63f51722bf943d7f3a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/auraphp/Aura.Sql/zipball/04eb3abc54634c0bbb502c63f51722bf943d7f3a",
+            "reference": "04eb3abc54634c0bbb502c63f51722bf943d7f3a",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4.0",
+            "aura/installer-default": "1.0.0"
+        },
+        "time": "2013-02-11 18:36:21",
+        "type": "aura-package",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Aura\\Sql": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-2-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Aura Contributors",
+                "homepage": "https://github.com/auraphp/Aura.Sql/contributors"
+            }
+        ],
+        "description": "A wrapper around PDO that provides connection adapters and convenience methods for MySQL, PostgreSQL, SQLite, and SQL Server.",
+        "homepage": "http://auraphp.github.com/Aura.Sql",
+        "keywords": [
+            "mysql",
+            "sqlite",
+            "postgresql",
+            "pdo",
+            "pgsql",
+            "postgres",
+            "sql server",
+            "sqlserver"
+        ]
+    },
+    {
+        "name": "pimple/pimple",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/fabpot/Pimple.git",
+            "reference": "5a8936d9d31eb613f1a33753e5f22bffebe0bbc3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/fabpot/Pimple/zipball/5a8936d9d31eb613f1a33753e5f22bffebe0bbc3",
+            "reference": "5a8936d9d31eb613f1a33753e5f22bffebe0bbc3",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2013-02-09 15:33:26",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.0.x-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Pimple": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            }
+        ],
+        "description": "Pimple is a simple Dependency Injection Container for PHP 5.3",
+        "homepage": "http://pimple.sensiolabs.org",
+        "keywords": [
+            "dependency injection",
+            "container"
+        ]
+    },
+    {
+        "name": "guzzle/guzzle",
+        "version": "v3.1.2",
+        "version_normalized": "3.1.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/guzzle/guzzle",
+            "reference": "v3.1.2"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/guzzle/guzzle/archive/v3.1.2.zip",
+            "reference": "v3.1.2",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.2",
+            "ext-curl": "*",
+            "symfony/event-dispatcher": ">=2.1"
+        },
+        "replace": {
+            "guzzle/batch": "self.version",
+            "guzzle/cache": "self.version",
+            "guzzle/common": "self.version",
+            "guzzle/http": "self.version",
+            "guzzle/inflection": "self.version",
+            "guzzle/iterator": "self.version",
+            "guzzle/log": "self.version",
+            "guzzle/parser": "self.version",
+            "guzzle/plugin": "self.version",
+            "guzzle/plugin-async": "self.version",
+            "guzzle/plugin-backoff": "self.version",
+            "guzzle/plugin-cache": "self.version",
+            "guzzle/plugin-cookie": "self.version",
+            "guzzle/plugin-curlauth": "self.version",
+            "guzzle/plugin-history": "self.version",
+            "guzzle/plugin-log": "self.version",
+            "guzzle/plugin-md5": "self.version",
+            "guzzle/plugin-mock": "self.version",
+            "guzzle/plugin-oauth": "self.version",
+            "guzzle/service": "self.version",
+            "guzzle/stream": "self.version"
+        },
+        "require-dev": {
+            "doctrine/common": "*",
+            "symfony/class-loader": "*",
+            "monolog/monolog": "1.*",
+            "zendframework/zend-cache": "2.0.*",
+            "zendframework/zend-log": "2.0.*",
+            "zend/zend-log1": "1.12",
+            "zend/zend-cache1": "1.12",
+            "phpunit/phpunit": "3.7.*"
+        },
+        "time": "2013-01-28 00:07:40",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.1-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Guzzle\\Tests": "tests/",
+                "Guzzle": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Michael Dowling",
+                "email": "mtdowling@gmail.com",
+                "homepage": "https://github.com/mtdowling"
+            },
+            {
+                "name": "Guzzle Community",
+                "homepage": "https://github.com/guzzle/guzzle/contributors"
+            }
+        ],
+        "description": "Guzzle is a PHP HTTP client library and framework for building RESTful web service clients",
+        "homepage": "http://guzzlephp.org/",
+        "keywords": [
+            "framework",
+            "curl",
+            "http",
+            "rest",
+            "http client",
+            "client",
+            "web service"
+        ]
+    },
+    {
+        "name": "symfony/process",
+        "version": "v2.1.8",
+        "version_normalized": "2.1.8.0",
+        "target-dir": "Symfony/Component/Process",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/Process.git",
+            "reference": "v2.1.8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/Process/zipball/v2.1.8",
+            "reference": "v2.1.8",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2013-02-18 21:27:57",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\Process": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony Process Component",
+        "homepage": "http://symfony.com"
+    },
+    {
+        "name": "symfony/event-dispatcher",
+        "version": "v2.1.8",
+        "version_normalized": "2.1.8.0",
+        "target-dir": "Symfony/Component/EventDispatcher",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/EventDispatcher.git",
+            "reference": "v2.1.8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/v2.1.8",
+            "reference": "v2.1.8",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "symfony/dependency-injection": "2.1.*"
+        },
+        "suggest": {
+            "symfony/dependency-injection": "2.1.*",
+            "symfony/http-kernel": "2.1.*"
+        },
+        "time": "2013-02-11 11:26:14",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\EventDispatcher": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony EventDispatcher Component",
+        "homepage": "http://symfony.com"
+    },
+    {
+        "name": "zendframework/zendframework",
+        "version": "2.1.3",
+        "version_normalized": "2.1.3.0",
+        "source": {
+            "type": "git",
+            "url": "git://github.com/zendframework/zf2.git",
+            "reference": "release-2.1.3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "http://packages.zendframework.com/releases/ZendFramework-2.1.3/ZendFramework-2.1.3.zip",
+            "reference": "release-2.1.3",
+            "shasum": "506246b4bfa78db0d19852b26f0d4e383f10603f"
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "replace": {
+            "zendframework/zend-acl": "self.version",
+            "zendframework/zend-authentication": "self.version",
+            "zendframework/zend-barcode": "self.version",
+            "zendframework/zend-cache": "self.version",
+            "zendframework/zend-captcha": "self.version",
+            "zendframework/zend-code": "self.version",
+            "zendframework/zend-config": "self.version",
+            "zendframework/zend-console": "self.version",
+            "zendframework/zend-crypt": "self.version",
+            "zendframework/zend-db": "self.version",
+            "zendframework/zend-di": "self.version",
+            "zendframework/zend-dom": "self.version",
+            "zendframework/zend-escaper": "self.version",
+            "zendframework/zend-eventmanager": "self.version",
+            "zendframework/zend-feed": "self.version",
+            "zendframework/zend-file": "self.version",
+            "zendframework/zend-filter": "self.version",
+            "zendframework/zend-form": "self.version",
+            "zendframework/zend-http": "self.version",
+            "zendframework/zend-i18n": "self.version",
+            "zendframework/zend-inputfilter": "self.version",
+            "zendframework/zend-json": "self.version",
+            "zendframework/zend-ldap": "self.version",
+            "zendframework/zend-loader": "self.version",
+            "zendframework/zend-log": "self.version",
+            "zendframework/zend-mail": "self.version",
+            "zendframework/zend-markup": "self.version",
+            "zendframework/zend-math": "self.version",
+            "zendframework/zend-memory": "self.version",
+            "zendframework/zend-mime": "self.version",
+            "zendframework/zend-modulemanager": "self.version",
+            "zendframework/zend-mvc": "self.version",
+            "zendframework/zend-navigation": "self.version",
+            "zendframework/zend-paginator": "self.version",
+            "zendframework/zend-progressbar": "self.version",
+            "zendframework/zend-serializer": "self.version",
+            "zendframework/zend-server": "self.version",
+            "zendframework/zend-servicemanager": "self.version",
+            "zendframework/zend-session": "self.version",
+            "zendframework/zend-soap": "self.version",
+            "zendframework/zend-stdlib": "self.version",
+            "zendframework/zend-tag": "self.version",
+            "zendframework/zend-text": "self.version",
+            "zendframework/zend-uri": "self.version",
+            "zendframework/zend-validator": "self.version",
+            "zendframework/zend-view": "self.version",
+            "zendframework/zend-xmlrpc": "self.version"
+        },
+        "require-dev": {
+            "doctrine/common": ">=2.1"
+        },
+        "suggest": {
+            "doctrine/common": "Doctrine\\Common >=2.1 for annotation features",
+            "ext-intl": "ext/intl for i18n features",
+            "pecl-weakref": "Implementation of weak references for Zend\\Stdlib\\CallbackHandler",
+            "zendframework/zendpdf": "ZendPdf for creating PDF representations of barcodes",
+            "zendframework/zendservice-recaptcha": "ZendService\\ReCaptcha for rendering ReCaptchas in Zend\\Captcha and/or Zend\\Form"
+        },
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Zend\\": "library/",
+                "ZendTest\\": "tests/"
+            }
+        },
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "description": "Zend Framework 2",
+        "keywords": [
+            "framework",
+            "zf2"
+        ],
+        "support": {
+            "email": "fw-general-subscribe@lists.zend.com",
+            "irc": "irc://irc.freenode.net/zftalk",
+            "issues": "https://github.com/zendframework/zf2/issues",
+            "source": "https://github.com/zendframework/zf2"
+        }
+    },
+    {
+        "name": "zendframework/zend-version",
+        "version": "2.1.3",
+        "version_normalized": "2.1.3.0",
+        "target-dir": "Zend/Version",
+        "source": {
+            "type": "git",
+            "url": "git://github.com/zendframework/Component_ZendVersion-2.1.3.git",
+            "reference": "release-2.1.3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://packages.zendframework.com/composer/Zend_Version-2.1.3.zip",
+            "reference": null,
+            "shasum": null
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.1-dev",
+                "dev-develop": "2.2-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Zend\\Version\\": ""
+            }
+        },
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "description": " ",
+        "homepage": "http://packages.zendframework.com/",
+        "keywords": [
+            "zf2",
+            "version"
+        ],
+        "support": {
+            "email": "fw-general-subscribe@lists.zend.com",
+            "irc": "irc://irc.freenode.net/zftalk",
+            "issues": "https://github.com/zendframework/zf2/issues",
+            "source": "https://github.com/zendframework/zf2"
+        }
+    },
+    {
+        "name": "ddeboer/data-import",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/ddeboer/data-import.git",
+            "reference": "daaa98385645bb1514eb4d8659c2a04ead2b4426"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/ddeboer/data-import/zipball/daaa98385645bb1514eb4d8659c2a04ead2b4426",
+            "reference": "daaa98385645bb1514eb4d8659c2a04ead2b4426",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "ext-sqlite3": "*",
+            "symfony/form": "*",
+            "phpexcel/phpexcel": "*",
+            "doctrine/dbal": "*",
+            "doctrine/orm": "*",
+            "symfony/console": "*"
+        },
+        "suggest": {
+            "phpexcel/phpexcel": "If you want to use the ExcelReader",
+            "symfony/form": "If you want to use the ObjectConverter",
+            "doctrine/dbal": "If you want to use the DbalReader",
+            "symfony/console": "If you want to use the ConsoleProgressWriter",
+            "ext-iconv": "For the CharsetValueConverter",
+            "ext-mbstring": "For the CharsetValueConverter"
+        },
+        "time": "2013-02-24 20:42:49",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Ddeboer\\DataImport": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "David de Boer",
+                "email": "david@ddeboer.nl",
+                "homepage": "http://ddeboer.nl"
+            }
+        ],
+        "description": "Import data from, and export data to, a range of file formats and media",
+        "keywords": [
+            "data",
+            "excel",
+            "csv",
+            "import",
+            "doctrine",
+            "export"
         ]
     },
     {
         "name": "twitter/bootstrap",
-        "version": "dev-2.3.0-wip",
-        "version_normalized": "dev-2.3.0-wip",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
         "source": {
             "type": "git",
-            "url": "git://github.com/twitter/bootstrap.git",
-            "reference": "337741fc9aa89e691f15c45d59cd4b70e4b16527"
+            "url": "https://github.com/twitter/bootstrap.git",
+            "reference": "16111a5e454a8af4407f4217b5defb6d7a9bdbd3"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/twitter/bootstrap/archive/337741fc9aa89e691f15c45d59cd4b70e4b16527.zip",
-            "reference": "337741fc9aa89e691f15c45d59cd4b70e4b16527",
+            "url": "https://api.github.com/repos/twitter/bootstrap/zipball/16111a5e454a8af4407f4217b5defb6d7a9bdbd3",
+            "reference": "16111a5e454a8af4407f4217b5defb6d7a9bdbd3",
             "shasum": ""
         },
-        "time": "2013-01-14 08:33:16",
+        "time": "2013-02-21 21:10:21",
         "type": "library",
         "installation-source": "source",
         "notification-url": "https://packagist.org/downloads/",
@@ -213,6 +1122,77 @@
         "keywords": [
             "css",
             "bootstrap"
+        ]
+    },
+    {
+        "name": "cartalyst/sentry",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/cartalyst/sentry.git",
+            "reference": "eae96709406c7f1b661a18aff0859cf162571afd"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/cartalyst/sentry/zipball/eae96709406c7f1b661a18aff0859cf162571afd",
+            "reference": "eae96709406c7f1b661a18aff0859cf162571afd",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "mockery/mockery": "0.7.2",
+            "illuminate/cookie": "4.0.*",
+            "illuminate/database": "4.0.*",
+            "illuminate/session": "4.0.*",
+            "ircmaxell/password-compat": "1.0.*"
+        },
+        "suggest": {
+            "illuminate/cookie": "Sentry provides an Illuminate cookie driver for cookie integration.",
+            "illuminate/database": "Sentry provides Eloquent models for User, Group and Throttle providers.",
+            "illuminate/session": "Sentry provides an Illuminate session driver for storage integration.",
+            "ircmaxell/password-compat": "A forward-compatible PHP 5.5 password package for password_* functions can be used as a hasher (NativeHasher) in Sentry.",
+            "dhorrigan/capsule": "Capsule is a small utility for managing database connections given to illuminate/database outside of Laravel 4."
+        },
+        "time": "2013-02-22 20:08:46",
+        "type": "library",
+        "extra": {
+            "component": "package",
+            "branch-alias": {
+                "dev-master": "2.0-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "classmap": [
+                "src/Cartalyst/Sentry/Groups/Exceptions.php",
+                "src/Cartalyst/Sentry/Throttling/Exceptions.php",
+                "src/Cartalyst/Sentry/Users/Exceptions.php",
+                "src/migrations"
+            ],
+            "psr-0": {
+                "Cartalyst\\Sentry": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD License (3-clause)"
+        ],
+        "authors": [
+            {
+                "name": "Cartalyst",
+                "email": "help@cartalyst.com"
+            }
+        ],
+        "description": "PHP 5.3+ fully-featured authentication & authorization system",
+        "keywords": [
+            "security",
+            "Authentication",
+            "auth",
+            "laravel4",
+            "laravel3"
         ]
     }
 ]

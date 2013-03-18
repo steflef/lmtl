@@ -11,3 +11,6 @@
 /ext/htmlpuifier/
 /ext/jsmin/
 /ext/propel/
+
+# Config
+/www/collab_api/cq_atlas/config/

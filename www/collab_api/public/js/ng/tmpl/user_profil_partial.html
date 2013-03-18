@@ -1,0 +1,58 @@
+<div ng-controller="UserProfilCtrl">
+    <div id="forageColumn" style="overflow: hidden;">
+
+        <h4><a href="#watchers">Sentinelles</a> / Par Utilisateur </h4>
+
+
+        <div ng-hide="alert.display">
+            <p style="margin-bottom: 10px;" class="lead">{{profil.details.username}}</p>
+        </div>
+
+        <div class="alert alert-info alert-block" ng-show="alert.display">
+            <button type="button" class="close" data-dismiss="alert" ng-click="hideAlert()">×</button>
+            <h4>Aucun résultat pour l'utilisateur #{{userId}}!</h4>
+        </div>
+
+        <div class="row" ng-hide="alert.display">
+            <div class="span9">
+                <span class="bold">Abonnements <em>({{getSubscriptionsLength() | number}})</em></span>
+                <ul class="subscriptions">
+                    <li ng-repeat="s in profil.subscriptions">
+                        <a href="#watcher/{{s.id}}">{{s.name}}</a>
+                        <span style="margin: 10px;" class="pull-right"><small>Créée le {{s.created}}</small></span>
+                        <br>
+                        <small>Par <a href="#profil/{{s.user_id}}">{{s.username}}</a></small>
+
+                        <p class="noDisplay"><span class="bold">Notes</span><br>{{s.note}}</p>
+                    </li>
+                </ul>
+                <p ng-show="getSubscribersLength() == 0">
+                    Aucun abonnement
+                </p>
+            </div>
+        </div>
+
+        <div class="row gap" ng-hide="alert.display">
+            <div class="span9">
+                <span class="bold">Sentinelles créées <em>({{getWatchersLength() | number}})</em></span>
+                <ul class="subscriptions">
+                    <li ng-repeat="w in profil.watchers">
+                        <a href="#watcher/{{w.id}}">{{w.name}}</a>
+                        <span style="margin: 10px;" class="pull-right"><small>Créée le {{w.created}}</small></span>
+                        <br>
+                        <small>Par <a href="#profil/{{w.user_id}}">{{w.username}}</a> | ({{w.subscribers | number}}) abonnés
+                        </small>
+
+                        <p class="noDisplay"><span class="bold">Notes</span><br>{{w.note}}</p>
+                    </li>
+                </ul>
+                <p ng-show="getWatchersLength() == 0">
+                    Aucune sentinelle
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<!--</div>-->
+
+<!--</div>-->

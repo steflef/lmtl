@@ -1,0 +1,76 @@
+function UserWatchersCtrl($rootScope, $scope, $filter, $http) {
+
+    $scope.baseUrl = gdata.app.baseUrl;
+    var _scope = $scope;
+    $scope.userWatchers = 'active';
+    $scope.publicWatchers = '';
+    $scope.orderList='created';
+    $scope.reverseCheck= true;
+    $scope.watchers = {
+        items:{},
+        total:function(){
+            return this.items.length;
+        }
+    };
+    $scope.message = '';
+
+    $scope.fetchWatchers = function () {
+
+        $http.get($scope.baseUrl+'api/rao/watchers/format/json')
+            .then(
+            function (result) {
+                if (result.status === 200) {
+                    $scope.watchers.items = result.data;
+                }
+            },
+            function (reason) {
+                console.log(reason.headers());
+            }
+        );
+    }
+
+    $scope.unsubscribe = function(id, index){
+
+        $scope.forage.items.splice(index, 1);
+
+        $http.delete($scope.baseUrl+'api/rao/watcher/id/'+ id +'/format/json')
+            .then(
+            function (result) {
+                if (result.status === 200) {
+
+                    console.log(result);
+                }
+            },
+            function (reason) {
+
+                console.log(reason);
+            }
+        );
+    }
+
+
+    $scope.subscribe = function(id, index){
+
+        $scope.forage.items.splice(index, 1);
+
+        $http.put(
+            $scope.baseUrl+'api/rao/watcher/format/json',
+            {id:id}
+        )
+        .then(
+            function (result) {
+                if (result.status === 200) {
+
+                    console.log(result);
+                }
+            },
+            function (reason) {
+
+                console.log(reason);
+            }
+        );
+    }
+
+    $rootScope.$broadcast('newRoute', {hash:'#watchers'});
+    $scope.fetchWatchers();
+}

@@ -1,0 +1,39 @@
+<div class="navbar navbar-fixed-top navbar-inverse">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="{{baseUrl}}">{{appTitle}}</a>
+            <ul class="nav">
+<!--                <li class="active">
+                    <a href="{{baseUrl}}{{selectedUrl}}">
+                        <i class="{{selectedIcon}} icon-white"></i> {{selectedItem}}
+                    </a>
+                </li>-->
+
+                <li ng-repeat="item in topmenu" class="{{item.selected}}">
+                    <a href="{{baseUrl}}{{item.url}}">
+                        <!--<i class="{{item.icon}}"></i>--> {{item.title}}
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav pull-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="icon-user icon-white"></i> <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{baseUrl}}logout">
+                            <i class="icon-off"></i> Déconnexion</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="{{baseUrl}}user"><i class="icon-user"></i> Zone Utilisateur</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="{{baseUrl}}infos"><i class="icon-info-sign icon-white"></i></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

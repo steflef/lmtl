@@ -1,0 +1,139 @@
+<div ng-controller="UserSubscriptionsCtrl">
+<modal>
+    <div class="modal hide fade in" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Créer une Sentinelle</h3>
+        </div>
+        <div class="modal-body">
+            <h5 class="bold">Sentinelle <small class="bold">Forage de référence: <a href="{{baseUrl}}tb/rao#{{sentinelle.forage.uri}}" onclick="window.open(this.href); return false;">{{sentinelle.forage.name}}</a></small></h5>
+            <label for="s_name">Nom de la Sentinelle</label>
+            <input id="s_name" class="input-xlarge" type="text" placeholder="ex.: Vols, District 3" ng-model="sentinelle.name">
+            <label for="s_note">Notes / Description</label>
+            <textarea id="s_note" style="resize: none;width:80%;" rows="3" ng-model="sentinelle.note"></textarea>
+            <label class="checkbox" >
+                <input id="s_public" type="checkbox" ng-model="sentinelle.public.checked" ng-disabled="sentinelle.public.isDisabled">Public
+            </label>
+
+            <h5 class="bold">Abonnement / Fréquence des alertes</h5>
+            <label class="checkbox">
+                <input type="checkbox" ng-model="sentinelle.subscriptions.each.checked">
+                À chaque nouvel appel
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" ng-model="sentinelle.subscriptions.daily.checked">
+                Sommatif hebdomadaire
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" ng-model="sentinelle.subscriptions.monthly.checked">
+                Sommatif mensuel
+            </label>
+            <p><small><i class="icon-info-sign"></i> Vous pouvez accéder à vos abonnements via la <em>Zone Utilisateur (<i class="icon-user"></i>)</em></small></p>
+            <!--<legend>Forage de référence</legend>-->
+            <dl class="event fs call noDisplay">
+                <dd class="c-desc"> <a href="{{baseUrl}}tb/rao#{{sentinelle.forage.uri}}" onclick="window.open(this.href); return false;"><span>{{sentinelle.forage.name}}</span></a></dd>
+                <dd >
+                    <ul class="well"  style="list-style: none;margin-left:0px;">
+                        <li style="font-size: 12px;" ng-repeat="h in sentinelle.forage.human"><span style="font-family: OpenSansBold;">{{h.label}}</span> {{h.value}}</li>
+                    </ul>
+                </dd>
+            </dl>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-small btn-primary" hide-modal ng-click="setWatcher()">Enregistrer</button> ou <a href="#" data-dismiss="modal">Fermer</a>
+        </div>
+    </div>
+</modal>
+    <div id="forageColumn">
+        <div style="height: 34px;">
+            <span class="lead">Sentinelles</span>
+
+            <div class="btn-group pull-right">
+                <a href="#watchers"
+                   class="btn btn-small {{userWatchers}}">Vos Sentinelles</a>
+                <a href="#publicwatchers"
+                   class="btn btn-small {{publicWatchers}}">Sentinelles Publiques</a>
+                <a href="#watcherssubscriptions"
+                   class="btn btn-small {{subscriptionWatchers}}">Abonnements</a>
+            </div>
+        </div>
+
+        <div class="alert alert-info alert-block" ng-show="alert.display">
+            <button type="button" class="close" data-dismiss="alert" ng-click="hideAlert()">×</button>
+            <h4>Aucun résultat pour cette requête!</h4>
+        </div>
+
+        <div class="filter-forms" style="border: none;">
+            <form class="form-inline ">
+                <filterSearch>
+                    <input class="input-large query-{{queryLength}}" type="search" placeholder="Filtre" ng-model="query">
+                </filterSearch>
+                <orderby style="margin-left: 40px;">
+                    <label><em>Ordonner par</em></label>
+                    <select class="input-medium" ng-model="orderList">
+                        <option value="username">Utilisateur</option>
+                        <option value="created">Date de création</option>
+                        <option value="name">Nom</option>
+                    </select>
+                    <label class="checkbox">
+                        <h6>
+                            <input type="checkbox" ng-checked="reverseCheck" ng-model="reverseCheck">
+                            Ordre descendant
+                        </h6>
+                    </label>
+                </orderby>
+            </form>
+        </div>
+
+        <div class="row" >
+            <div class="span3"
+                 style="border: none;"
+                 ng-repeat="w in watchers.items | filter:query | orderBy:orderList:reverseCheck">
+
+                <div class="{{w.id}} fbm watcher-well test-{{w.user_match|number}}">
+
+                    <div ng-show="w.user_match == null">
+                        <div class="watcher-button">
+                            <a class="btn btn-mini dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                <i class=" icon-watcher-plus"></i>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu pull-right" >
+                                <li><a display-modal href>Vous abonner</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div ng-show="w.user_match != null">
+                        <div class="watcher-button">
+                            <a class="btn btn-mini btn-success dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                <i class="icon-watcher-ok"></i>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+                                <li><a display-modal href>Désabonnement</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <dl id="_{{w.id}}" class="event fs call" style="border: none;" >
+                        <dd><small>{{w.created}}</small></dd>
+                        <dd>
+                            <a href="{{baseUrl}}user#watcher/{{w.id}}"
+                               class="bold"
+                               style="font-size: 15px;">{{w.name}}</a>
+                        </dd>
+                        <dd>Par <a href="#profil/{{w.user_id}}">{{w.username}}</a></dd>
+                        <dd>{{w.subscribers | number}} abonné(s)</dd>
+                        <dd class="c-desc noDisplay">{{w.note}}
+                            <em>(<a href="{{baseUrl}}tb/rao#{{w.forage_uri}}" onclick="window.open(this.href); return false;">Forage original</a>)</em>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

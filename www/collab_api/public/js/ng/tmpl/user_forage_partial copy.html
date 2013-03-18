@@ -1,0 +1,96 @@
+<div ng-controller="UserForagesCtrl">
+<modal>
+    <div class="modal hide fade in" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Créer une Sentinelle</h3>
+        </div>
+        <div class="modal-body">
+            <h5 class="bold">Sentinelle <small class="bold">Forage de référence: <a href="{{baseUrl}}tb/rao#{{sentinelle.forage.uri}}" onclick="window.open(this.href); return false;">{{sentinelle.forage.name}}</a></small></h5>
+            <label for="s_name">Nom de la Sentinelle</label>
+            <input id="s_name" class="input-xlarge" type="text" placeholder="ex.: Vols, District 3" ng-model="sentinelle.name">
+            <label for="s_note">Notes / Description</label>
+            <textarea id="s_note" style="resize: none;width:80%;" rows="3" >{{sentinelle.note}}</textarea>
+            <label class="checkbox" >
+                <input id="s_public" type="checkbox" ng-model="sentinelle.public.checked" ng-disabled="sentinelle.public.isDisabled">Public
+            </label>
+
+            <h5 class="bold">Abonnement / Fréquence des alertes</h5>
+            <label class="checkbox">
+                <input type="checkbox" ng-model="sentinelle.subscriptions.each.checked">
+                À chaque nouvel appel
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" ng-model="sentinelle.subscriptions.daily.checked">
+                Sommatif hebdomadaire
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" ng-model="sentinelle.subscriptions.monthly.checked">
+                Sommatif mensuel
+            </label>
+            <p><small><i class="icon-info-sign"></i> Vous pouvez accéder à vos abonnements via la <em>Zone Utilisateur (<i class="icon-user"></i>)</em></small></p>
+            <!--<legend>Forage de référence</legend>-->
+            <dl class="event fs call noDisplay">
+                <dd class="c-desc"> <a href="{{baseUrl}}tb/rao#{{sentinelle.forage.uri}}" onclick="window.open(this.href); return false;"><span>{{sentinelle.forage.name}}</span></a></dd>
+                <dd >
+                    <ul class="well"  style="list-style: none;margin-left:0px;">
+                        <li style="font-size: 12px;" ng-repeat="h in sentinelle.forage.human"><span style="font-family: OpenSansBold;">{{h.label}}</span> {{h.value}}</li>
+                    </ul>
+                </dd>
+            </dl>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-small btn-primary" hide-modal ng-click="setWatcher()">Enregistrer</button> ou <a href="#" data-dismiss="modal">Fermer</a>
+        </div>
+    </div>
+</modal>
+<div id="forageColumn">
+    <h3>Liste des forages sauvegardés</h3>
+    <div class="alert alert-info alert-block" ng-show="alert.display">
+        <button type="button" class="close" data-dismiss="alert" ng-click="hideAlert()">×</button>
+        <h4>Aucun résultat pour cette requête!</h4>
+    </div>
+    <div class="filter-forms">
+        <form class="form-inline form-inline-bottom">
+            <input class="input-xlarge query-{{queryLength}}" type="search" placeholder="Filtre" ng-model="query">
+            <total-appels> {{ (forage.items |filter:query).length }} forage(s)</total-appels>
+            <br>
+            <label><em>Ordonner par</em></label>
+            <select class="input-medium" ng-model="orderList">
+                <option value="id">Identifiant</option>
+                <option value="created">Date</option>
+                <option value="name">Nom du forage</option>
+            </select>
+            <label class="checkbox">
+                <h6>
+                    <input type="checkbox" ng-checked="reverseCheck" ng-model="reverseCheck">
+                    Ordre descendant
+                </h6>
+            </label>
+        </form>
+    </div>
+    <div>
+        <div class="eInfos" id="c_{{f.id}}"
+             ng-repeat="f in forage.items | filter:query | orderBy:orderList:reverseCheck">
+            <div class="{{f.id}} fbm">
+
+                <dl id="_{{f.id}}" class="event fs call">
+
+                    <buttton class="btn btn-mini btn-danger pull-right"  ng-click="deleteForage(f.id,$index)"><i class="icon-trash icon-white"></i> Supprimer ce forage</buttton>
+                    <buttton display-modal style="margin-right: 10px;" class="btn btn-mini btn-info pull-right" ng-click="buildSentinelle($index)"><i class="icon-eye-open icon-white"></i> Sentinelle</buttton>
+                    <dd>
+                        <span>{{f.created}}</span>
+                    </dd>
+                    <dd class="c-desc"> <a href="{{baseUrl}}tb/rao#{{f.uri}}" onclick="window.open(this.href); return false;"><span>{{f.name}}</span></a></dd>
+                    <dd class="c-desc"><span>{{f.total}} appel(s)</span></dd>
+                    <dd >
+                        <ul class="well"  style="list-style: none;margin-left:0px;">
+                            <li style="font-size: 12px;" ng-repeat="h in f.human"><span style="font-family: OpenSansBold;">{{h.label}}</span> {{h.value}}</li>
+                        </ul>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

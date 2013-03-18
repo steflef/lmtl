@@ -1,0 +1,71 @@
+<div class="filter-box-mod">
+    <dl id="ref-header" class="event">
+        <dd><strong>Appel # {{call.results.resume.call_id}}</strong></dd>
+        <dd><strong>{{call.results.resume.call_dt}}</strong></dd>
+        <dd><strong><a
+                href="{base_url}rapports/filtres/par-code/{{code}}/">{{call.results.resume.call_desc}}</a></strong></dd>
+        <div id="loading"><img src="/gatlas_spring/public/imgs/interface/loader.gif" alt="Chargement en cours..."/>
+        </div>
+    </dl>
+</div>
+<div>
+    <div class="tabbable tabs-below"> <!-- Only required for left/right tabs -->
+        <ul class="nav nav-tabs" style="margin-bottom:4px;">
+            <li class="active"><a href="#tab1" data-toggle="tab">Résumé</a></li>
+            <li><a href="#tab2" data-toggle="tab">Séquence</a></li>
+            <li><a href="#tab3" data-toggle="tab">Historique</a></li>
+            <li><a href="#tab4" data-toggle="tab">Terminal</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="tab1" class="tab-pane active">
+                <div class="e-infos sub-infos">
+                    <div class="i-content">
+                        <div ng-bind-html="call.results.resumeHtml"></div>
+                        <div style="margin-top:10px;border:0;padding:8px;-moz-border-radius:5px;background-color:#e6e6e6;float:left;width:96%;">
+                            <div id="g-map" style="border:2px solid #666;height:200px;width:220px;float:left;"></div>
+                            <div class="lieu-infos" style="float:right;width:350px;font-size:14px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tab2" class="tab-pane">
+                <div class="e-sequence sub-infos">
+                    <div class="i-content" ng-bind-html="call.results.sequenceHtml"></div>
+                </div>
+            </div>
+            <div id="tab3" class="tab-pane">
+                <div class="e-histo sub-infos">
+                    <div class="i-content">
+
+                        <div class="histoInfos" ng-repeat="call in call.results.history.results">
+                            <div class="{{call.call_id}} filter-box-mod h-left">
+                                <dl id="_{{call.call_id}}" class="event font_style">
+                                    <dt><a href="#" onclick="window.location.replace('rao911/ref/{{call.card_id}}')"
+                                           title="Accès à cet appel via RAO911"/>#{{call.call_id}}</a></dt>
+                                    <dt class="toBottom {{call.geom_valid}}"></dt>
+                                    <dd>{{call.call_dt}}</dd>
+                                    <dd>{{call.call_desc}}</dd>
+                                </dl>
+                            </div>
+                            <div class="h-right">
+                                {{call.distance}}<br/><span>mètre(s)</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div id="tab4" class="tab-pane">
+                <div class="e-raw sub-infos">
+                    <div class="i-content terminal">
+                        <ul>
+                            <li ng-repeat="val in call.results.raw_data">{{val.desc}} > {{val.value}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

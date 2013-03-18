@@ -1,0 +1,81 @@
+<div ng-controller="UserWatcherDetailsCtrl">
+    <div id="forageColumn" style="overflow: hidden;">
+        <h4><a href="#watchers">Sentinelles</a> / Détail / </h4>
+        <p class="noDisplay">Voici les détails de la sentinelle "<span class="bold">{{watcher.details.name}}</span>". Vous y retrouvez le nom, la description, le <a href="{{baseUrl}}tb/rao#{{watcher.details.forage_uri}}" onclick="windowatcher.details.open(this.href); return false;">forage de référence</a> ainsi que la liste des abonnés à cette sentinelle.</p>
+
+        <div style="position: relative;" ng-hide="alert.display">
+
+            <div ng-show="watcher.details.user_match == null">
+                <div class="watcher-button">
+                    <a class="btn btn-mini dropdown-toggle"
+                       data-toggle="dropdown"
+                       href="#">
+                        <i class=" icon-watcher-plus"></i>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu pull-right">
+                        <li><a display-modal href>Vous abonner</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div ng-show="watcher.details.user_match != null">
+                <div class="watcher-button">
+                    <a class="btn btn-mini btn-success dropdown-toggle"
+                       data-toggle="dropdown"
+                       href="#">
+                        <i class="icon-watcher-ok"></i>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu pull-right">
+                        <li><a display-modal href>Désabonnement</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-bottom: 4px;" class="lead">{{watcher.details.name}}</p>
+
+            <p>
+                <small>Créée le {{watcher.details.created}}</small>
+                <br>
+                Par <a class="bold" href="#profil/{{watcher.details.user_id}}">{{watcher.details.username}}</a>
+            </p>
+
+
+            <p><span class="bold">Description / Notes</span> <br>{{watcher.details.note}}</p>
+
+            <p>
+            <span class="bold">
+                <a href="{{baseUrl}}tb/rao#{{watcher.details.forage_uri}}"
+                   onclick="windowatcher.details.open(this.href); return false;">Forage de référence</a>
+            </span>
+
+            <ul style="list-style: none;margin:8px;">
+                <li style="font-size: 12px;" ng-repeat="h in watcher.details.human"><span
+                        class="bold">{{h.label}}</span> {{h.value}}
+                </li>
+            </ul>
+            </p>
+
+            <div class="row">
+                <div class="span9">
+                    <span class="bold">Abonnés <em>({{getSubscribersLength() | number}})</em></span>
+                    <ul class="subscribers">
+                        <li ng-repeat="s in watcher.subscribers">
+                            <span><i class="icon-user"></i></span>
+                            <a href="#profil/{{s.id}}">{{s.username}}</a>
+                            <span style="margin-right: 10px;" class="pull-right"><small>Depuis le {{s.created}}</small></span>
+                        </li>
+                    </ul>
+                    <p ng-show="getSubscribersLength() == 0">
+                        Aucun abonnement
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-info alert-block" ng-show="alert.display">
+            <button type="button" class="close" data-dismiss="alert" ng-click="hideAlert()">×</button>
+            <h4>Aucun résultat pour cette sentinelle!</h4>
+        </div>
+    </div>
+
+
+</div>

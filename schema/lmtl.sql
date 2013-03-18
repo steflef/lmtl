@@ -18,12 +18,31 @@ CREATE TABLE places
   point_3857 geography(POINT,3857),
   privacy smallint,
   status smallint,
-  tags hstore,
-  -- tags_json text,
+  tags test,
   created_at timestamp without time zone,
   updated_at timestamp without time zone,
   CONSTRAINT places_pkey PRIMARY KEY (id )
 );
+
+  address text,
+  latitude double precision,
+  longitude double precision,
+  geohash varying(255),
+  point_26918 geography(POINT,26918),
+  point_4326 geography(POINT,4326),
+  point_3857 geography(POINT,3857),
+  privacy smallint,
+  status smallint,
+  tags test,
+ALTER TABLE test_2 ADD COLUMN cq_id serial NOT NULL;
+ALTER TABLE test_2 ADD COLUMN location text;
+ALTER TABLE test_2 ADD COLUMN latitude double precision;
+ALTER TABLE test_2 ADD COLUMN longitude double precision;
+ALTER TABLE test_2 ADD COLUMN geohash varying(255);
+ALTER TABLE test_2 ADD COLUMN point_4326 geography(POINT,4326);
+ALTER TABLE test_2 ADD COLUMN privacy smallint;
+ALTER TABLE test_2 ADD COLUMN status smallint;
+ALTER TABLE test_2 ADD COLUMN tags text;
 
 CREATE TABLE datasets
 (
@@ -84,6 +103,21 @@ CREATE TABLE users(
   updated_at timestamp without time zone,
   CONSTRAINT users_pkey PRIMARY KEY (id )
 );
+-- SQLITE
+CREATE TABLE users(
+  id INTEGER PRIMARY KEY,
+  email TEXT UNIQUE,
+  password TEXT,
+  salt TEXT,
+  role INTEGER,
+  username TEXT UNIQUE,
+  datasets_count INTEGER,
+  created_at NUMERIC ,
+  updated_at NUMERIC
+);
+
+INSERT INTO users (email, password, salt, role, username, datasets_count, created_at, updated_at)
+VALUES ('admin@admin.com', 'd033e22ae348aeb5660fc2140aec35850c4da997', '$2y$24$sRWNKw7DRrtPJBSI9vALPA', 1, 'STEFLEF', 0, '1359304821', '1359304821');
 
 CREATE TABLE groups(
   id serial NOT NULL,

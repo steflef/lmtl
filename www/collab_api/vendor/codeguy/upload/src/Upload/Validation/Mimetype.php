@@ -51,7 +51,7 @@ class Mimetype extends \Upload\Validation\Base
      * Error message
      * @var string
      */
-    protected $message = 'Invalid mimetype';
+    protected $message = 'Format de fichier non-supporté (mimetype)';
 
     /**
      * Constructor

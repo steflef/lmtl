@@ -1,0 +1,57 @@
+{
+    "1":{
+        "labels":{
+            "en":"Places",
+            "fr":"Lieu"
+        },
+        "parents":[
+
+        ],
+        "abstract":true,
+        "icon":""
+    },
+    "2":{
+        "labels":{
+            "en":"Organismes",
+            "fr":"Organismes"
+        },
+        "parents":[
+            "1"
+        ],
+        "abstract":false,
+        "icon":""
+    },
+    "3":{
+        "labels":{
+            "en":"Accessibilité universelle",
+            "fr":"Accessibilité universelle"
+        },
+        "parents":[
+            "2"
+        ],
+        "abstract":false,
+        "icon":""
+    },
+    "4":{
+        "labels":{
+            "en":"Affaires interculturelles",
+            "fr":"Affaires interculturelles"
+        },
+        "parents":[
+            "2"
+        ],
+        "abstract":false,
+        "icon":""
+    },
+    "5":{
+        "labels":{
+            "en":"Seniors",
+            "fr":"Aînés"
+        },
+        "parents":[
+            "2"
+        ],
+        "abstract":false,
+        "icon":""
+    }
+}

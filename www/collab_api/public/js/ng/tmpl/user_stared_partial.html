@@ -1,0 +1,71 @@
+<div class="mapColumn">
+    <div class="map-wrapper" ng-controller="MapCtrl">
+        <div map id="mapPort">
+        </div>
+        <div class="map-pull">
+            <i class="icon-chevron-down icon-white"></i>
+        </div>
+    </div>
+</div>
+<div  ng-controller="UserCtrl"></div>
+<div id="listColumn" ng-controller="EvntCtrl">
+    <div class="alert alert-info alert-block" ng-show="alert.display">
+        <button type="button" class="close" data-dismiss="alert" ng-click="hideAlert()">×</button>
+        <h4>Aucun résultat pour cette requête!</h4> Nous conservons temporairement les résultats de la requête précédente.
+    </div>
+    <div class="filter-forms">
+        <form class="form-inline form-inline-bottom">
+            <input class="input-xlarge query-{{queryLength}}" type="search" placeholder="Filtre" ng-model="query">
+            <total-appels> {{ (evnts |filter:query).length }} appels</total-appels>
+            <a href="#" class="tip" rel="tooltip" title="Maximum de 200 appels en visualisation cartographique. L'ensemble des données est offert en téléchargement."><i class="icon-question-sign"></i></a>
+            <br>
+            <label><em>Ordonner par</em></label>
+            <select class="input-medium" ng-model="orderList">
+                <option value="id">Identifiant</option>
+                <option value="dt">Date</option>
+                <option value="d">Description</option>
+                <option value="p">Priorité</option>
+            </select>
+            <label class="checkbox">
+                <h6>
+                    <input type="checkbox" ng-checked="reverseCheck" ng-model="reverseCheck">
+                    Ordre descendant
+                </h6>
+            </label>
+        </form>
+        <div class="download-area">
+            <div class="btn-group pull-right">
+                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="icon-download"></i> Télécharcher les données
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a ng-href="{{baseUrl}}api/rao/appels/{{alert.lastQuery}}/format/csv"><i class="icon-file"></i> CSV</a></li>
+                    <li><a ng-href="{{baseUrl}}api/rao/appels/{{alert.lastQuery}}/format/json" onclick="window.open(this.href); return false;"><i class="icon-file"></i> JSON</a></li>
+                    <li><a ng-href="{{baseUrl}}api/rao/appels/{{alert.lastQuery}}/format/xml" onclick="window.open(this.href); return false;"><i class="icon-file"></i> XML</a></li>
+                    <li class="divider"></li>
+                    <li><a ng-href="{{baseUrl}}api/rao/appels/{{alert.lastQuery}}/format/excel"><i class="icon-th-large"></i> Excel</a></li>
+                </ul>
+            </div>
+            <a class="btn btn-small pull-right print" href="#" onclick="window.print(); return false;" title="Imprimer"><i class="icon-print "></i></a>
+        </div>
+    </div>
+    <div>
+        <div class="last-query noDisplay">{{alert.lastQuery}}</div>
+        <div class="eInfos" id="c_{{call.id}}"
+             ng-repeat="call in evnts | filter:query | orderBy:orderList:reverseCheck">
+            <div class="{{call.id}} fbm">
+
+                <dl id="_{{call.id}}" class="event fs call">
+                    <dt class="geom">{{call.g}}</dt>
+                    <dd>
+                        <span class="index lbl l-dt geom-{{call.b|sub:2:3}}">{{$index+1}}</span>  <span class="lbl l-dt">{{call.dt}}</span> <img title="Événement" src="./public/imgs/star.png" class="display-bool-{{call.b|sub:0:1}}"> <img title="Commentaires" src="./public/imgs/comment.png" class="display-bool-{{call.b|sub:3:4}}"></i>  <img title="Incendie" src="./public/imgs/fire.png" class="display-bool-{{call.b|sub:1:2}}"> <img title="géoréférencé" src="./public/imgs/map-marker.png" class="display-bool-{{call.b|sub:2:3}}"> <span class="lbl l-dt">{{call.p}}</span>
+                        <buttton class="btn btn-mini btn-danger pull-right" ng-click="unstar(call.rid,$index)"><i class="icon-trash icon-white"></i> <span>Supprimer cet appel</span></buttton>
+                    </dd>
+                    <dd class="c-desc"><a href="../tb/details/{{call.id}}" onclick="window.open(this.href); return false;"><span>{{call.d}} <em>({{call.id}})</em></span></a></dd>
+                </dl>
+                <div class="chevron-right"><i class="icon-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
