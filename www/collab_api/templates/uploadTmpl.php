@@ -58,7 +58,7 @@
                     <input type="file"
                            size="40"
                            name="file_upload"
-                           onchange="console.log('CHANGE:'+ this.value.substring(this.value.length-3));angular.element(this).scope().changeFormat(this.value.substring(this.value.length-3));"
+                           onchange="angular.element(this).scope().changeFormat(this.value.substring(this.value.length-3));"
                            style="font-size: 16px;line-height: 18px;">
                     <br>
                     <input id="fileFormat"

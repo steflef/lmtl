@@ -48,7 +48,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
     .directive('chosenRao', function () {
         var linker = function(scope, element) {
             scope.$watch('cat.options', function(item){
-                console.log("Options Watcher");
+                //console.log("Options Watcher");
                 if(scope.cat.hash.lenght !== 0 ){
                     var codesList = _.pluck(scope.cat.options, 'id');
                     var indexes = [];
@@ -61,7 +61,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                 }
             },true);
 
-            _scope = scope;
+            var _scope = scope;
             //console.log(element);
             $(element).chosen().change( function(event, item){
 
@@ -150,15 +150,16 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                 self.changed();
             }
         });
+
         $scope.$on('prevStep', function ($scope) {
             if(self.step - 1 > 0){
                 self.step --;
                 self.changed();
             }
         });
+
         $scope.$on('toStep', function ($scope, param) {
             self.step = param.step;
-            //self.safeApply();
             self.changed();
         });
 
@@ -172,7 +173,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         });
 
         $scope.$on('newStep', function ($scope, stepObj) {
-            console.log(stepObj);
+            //console.log(stepObj);
             if(stepObj.step == self.maxSteps +1){
                 self.preValidate();
             }
@@ -186,36 +187,34 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         });
 
         $scope.$watch('step', function(newValue, oldValue) {
-            console.log("STEP "+oldValue + " > " + newValue);
             $rootScope.$broadcast("newStepAfter", {step:newValue});
         });
 
         // BROADCASTER
         $scope.next = function(){
-            console.log("NEXT FIRED!!!");
             $rootScope.$broadcast("nextStep");
-        }
+        };
+
         $scope.prev = function(){
-            console.log("PREV FIRED!!!");
             $rootScope.$broadcast("prevStep");
-        }
+        };
+
         $scope.toStep = function(step){
-            //console.log("PREV FIRED!!!");
             $rootScope.$broadcast("toStep",{step:step});
-        }
+        };
+
         $scope.changed = function(){
-            //console.log("CHANGED FIRED!!!");
             $rootScope.$broadcast("newStep", {step:self.step});
-        }
+        };
 
         $scope.setCheckStatus = function(item, status){
             var state = status || false;
-            $scope.check[item] = status;
-        }
+            $scope.check[item] = state;
+        };
 
         $scope.getCheckStatus = function(item){
             return $scope.check[item];
-        }
+        };
 
         $scope.validate = function(){
 
@@ -246,7 +245,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 
             results.status = "ok";
             return results;
-        }
+        };
 
         $scope.preValidate = function(){
 
@@ -260,7 +259,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             var child = self.$$childTail;
             var form  = child.uForm;
 
-            console.log(form);
+            //console.log(form);
 
             child.setCheckStatus("name", (form.name.value.length > 5 ));
             child.setCheckStatus("description", (form.desc.value.length > 5 ));
@@ -274,7 +273,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 
             console.log($scope.check);
             return $scope.check;
-        }
+        };
 
 
         $scope.publish = function(){
@@ -307,7 +306,8 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                     $scope.data = data || "Request failed";
                     $scope.status = status;
                 });
-        }
+            return true;
+        };
 
         $scope.showLoader = function(){
             if($scope.overlay){
@@ -343,7 +343,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                 spinner: spinner
             });
             return false;
-        }
+        };
 
         $scope.hideLoader = function(){
             if(!$scope.overlay){
@@ -354,10 +354,11 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 
             var handle = $scope.backdrop;
             handle.parentNode.removeChild(handle);
-        }
+            return true;
+        };
 
     })
-    .controller('UploadCtrl', function($rootScope, $scope, upload, $http) {
+    .controller('UploadCtrl', function($rootScope, $scope, upload) {
         var self = $scope;
         $scope.status=0;
         $scope.msg="";
@@ -366,7 +367,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         $scope.upload = function() {
             $rootScope.$broadcast("newUpload");
             $rootScope.$broadcast("load");
-            upload.submit("ng_upload",$scope.test);
+            upload.submit("ng_upload",$scope.uploadResponse);
         };
 
         $scope.fileChange = function() {
@@ -383,7 +384,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             console.log($scope);
         };
 
-        $scope.test = function(resp){
+        $scope.uploadResponse = function(resp){
             $rootScope.$broadcast("loadEnd");
             if(resp.substring(0,1)!="{"){
                 $scope.status = 400;
@@ -392,7 +393,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             }
 
             // NEED CONVERSION FROM text/html to json
-            oData = angular.fromJson(resp);
+            var oData = angular.fromJson(resp);
             console.log('RESPONSE:');
             console.log(oData);
 
@@ -411,6 +412,8 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             if(oData.status == 200){
                 $rootScope.$broadcast('newData', oData);
             }
+
+            return true;
         };
 
         $scope.viewScope = function(){
@@ -422,7 +425,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             console.log($rootScope);
         };
     })
-    .controller('TabPaneCtrl', function($rootScope, $scope, upload) {
+    .controller('TabPaneCtrl', function($rootScope, $scope) {
         var self = $scope;
 
         $scope.tabs = [
@@ -464,14 +467,14 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             }
         ];
 
-        $scope.$on('newData', function ($scope) {
+        $scope.$on('newData', function () {
             _.each(self.tabs, function(element){
                     element.show = true;
             });
             self.tabs[0].show = false;
         });
 
-        $scope.$on('clearData', function ($scope) {
+        $scope.$on('clearData', function () {
             _.each(self.tabs, function(element){
                 element.show = false;
             });
@@ -488,6 +491,8 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             });
         });
     })
+    // ## GridCtrl
+    // ### Injections/Services: $scope, $rootScope, $http
     .controller('GridCtrl', function($scope,$rootScope, $http) {
         var self = $scope;
         $scope.uData = [];
@@ -508,20 +513,17 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         };
 
         $http.get("./categories").
-            success(function(data, status) {
-                console.log(status);
-                console.log(data);
+            success(function(data) {
                 $scope.cat.options = data.results;
             }).
             error(function(data, status) {
                 console.log(status);
                 console.log(data);
-                //$scope.data = data || "Request failed";
-                //$scope.status = status;
             });
 
-        $scope.$on('newUpload', function ($scope) {
-            console.log("newUpload LISTENER >> GridCtrl");
+        // ### newUpload *Listener*
+        $scope.$on('newUpload', function () {
+            //console.log("newUpload LISTENER >> GridCtrl");
             self.uData = [];
             self.uHeaders = [];
             self.uMetadata = [];
@@ -531,9 +533,10 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             self.uGeoJson  = [];
         });
 
+        // ### newData *Listener*
         $scope.$on('newData', function ($scope, oData) {
 
-            console.log(oData);
+            //console.log(oData);
             self.uData = oData.data;
             self.uHeaders = oData.headers;
             self.uMetadata = oData.metadata;
@@ -595,9 +598,9 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 
         $scope.$on('newStepAfter', function ($scope, stepper) {
             if(stepper.step === 3 && self.uMetadata.geocoded === 1){
-                setTimeout(function(){self.bounds(); console.log("endTimeout");},1000 );
-
-                console.log("BOUNDS > 10");
+                setTimeout(function(){
+                    self.bounds();
+                },800 );
             }
         });
 
@@ -696,7 +699,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         $scope.bounds = function(){
             var bounds = new L.LatLngBounds(self.t_bounds);
             self.map.fitBounds(bounds);
-        }
+        };
 
         $scope.geocode = function () {
 
@@ -817,12 +820,12 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                     console.log(data);
                     $rootScope.$broadcast("loadEnd");
                 });
-        }
+        };
 
         $scope.capitaliseFirstLetter = function(string)
         {
             return string.charAt(0).toUpperCase() + string.slice(1);
-        }
+        };
 
         $scope.viewScope = function(){
             var self = $scope;

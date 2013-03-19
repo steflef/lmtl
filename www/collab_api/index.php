@@ -13,8 +13,8 @@ use \Slim\Slim;
 use Slim\Middleware\SessionCookie;
 use \Aura\Sql\ConnectionFactory;
 use \Pimple;
-use \Bcrypt; # todo
-use Guzzle\Http\Client; # todo
+//use \Bcrypt; # todo
+//use Guzzle\Http\Client; # todo
 
 require_once 'vendor/autoload.php';
 require_once 'models/lmtl.php'; # todo Aura Helper
@@ -26,7 +26,7 @@ $app = new Slim(array(
     'mode' => 'development' // selected mode, set with configureMode a/b
 ));
 
-// ####A | Production mode config
+// #### A | Production mode config
 $app->configureMode('production', function () use ($app) {
     $app->config(array(
         'log.enable' => true,
@@ -35,7 +35,7 @@ $app->configureMode('production', function () use ($app) {
     ));
 });
 
-// ####B | Development mode config
+// #### B | Development mode config
 $app->configureMode('development', function () use ($app) {
     $app->config(array(
         'log.enable' => false,
@@ -43,10 +43,10 @@ $app->configureMode('development', function () use ($app) {
     ));
 });
 
-// #####Add Custom Cache Middleware
+// ##### Add Custom Cache Middleware
 # $app->add(new \CQAtlas\Middlewares\Cache());
 
-// #####Hard to guess Cookie Salt
+// ##### Hard to guess Cookie Salt
 $app->add(new SessionCookie(array('secret' => 'nS#ul&1X4R7AOeIp+Q4T%nMX"4CS6~!')));
 
 // #### App Wide Exception Handling (Production Mode)
@@ -59,9 +59,9 @@ $app->error(function (\Exception $e) use ($app) {
 
 // ### Dependency Injection
 
-// ####>> Load Config (External with GitIgnore)
+// #### >> Load Config (External with GitIgnore)
 require_once('cq_atlas/config/config.php');
-// ####AURA.SQL Factory
+// #### AURA.SQL Factory
 $di['db'] = $di->share(function () use ($di){
     $connectionFactory = new ConnectionFactory;
     $connection = $connectionFactory->newInstance(
@@ -75,7 +75,7 @@ $di['db'] = $di->share(function () use ($di){
 
 // ### Routes Middlewares & Hooks
 
-// ####Authenticate *Route middleware*
+// #### Authenticate *Route middleware*
 $authenticate = function () use ($app, $di){
     return function () use ($app, $di) {
         if (!isset($_SESSION['user'])) {
@@ -86,7 +86,7 @@ $authenticate = function () use ($app, $di){
     };
 };
 
-// ####Authenticate *Route middleware* for API
+// #### Authenticate *Route middleware* for API
 // ##### RESPONSE via JSON
 $apiAuthenticate = function () use ($app, $di){
     return function () use ($app, $di) {
@@ -103,7 +103,7 @@ $apiAuthenticate = function () use ($app, $di){
     };
 };
 
-// ####Cache *Route middleware* for API Calls
+// #### Cache *Route middleware* for API Calls
 $apiCache = function () use ($app, $di){
     return function () use ($app, $di) {
         $Cache = new \CQAtlas\Helpers\Cache($app, $di);
@@ -111,8 +111,8 @@ $apiCache = function () use ($app, $di){
     };
 };
 
-// ####before.dispatch Hook
-// #####Pass User Infos to Templates
+// #### before.dispatch Hook
+// ##### Pass User Infos to Templates
 $app->hook('slim.before.dispatch', function() use ($app, $di) {
     $user = null;
 
@@ -126,8 +126,8 @@ $app->hook('slim.before.dispatch', function() use ($app, $di) {
 });
 // ***
 
-// ###HomePage -  */*
-// ###Main Endpoint (GET)[**A**]
+// ### HomePage -  */*
+// ### Main Endpoint (GET)[**A**]
 // Show the dashboard
 # $app->get("/", $authenticate($app), function () use ($app, $di) {
 $app->get("/",  function () use ($app, $di) {
@@ -135,9 +135,9 @@ $app->get("/",  function () use ($app, $di) {
 });
 // ***
 
-// ###API -  */datasets*
-// ###Datasets List (GET)
-// ####*JSON* - *STATIC CACHE*
+// ### API -  */datasets*
+// ### Datasets List (GET)
+// #### *JSON* - *STATIC CACHE*
 $app->get("/datasets", $apiCache($app, $di), function () use ($app, $di) {
 
     $from = 'datasets';
@@ -145,9 +145,9 @@ $app->get("/datasets", $apiCache($app, $di), function () use ($app, $di) {
 });
 // ***
 
-// ###API -  */datasets/:id*
-// ###Get a Dataset  (GET)
-// ####*JSON* - *STATIC CACHE*
+// ### API -  */datasets/:id*
+// ### Get a Dataset  (GET)
+// #### *JSON* - *STATIC CACHE*
 $app->get("/datasets/:id", $apiCache($app, $di), function ($datasetId) use ($app, $di) {
 
     $from = 'datasets';
@@ -156,9 +156,9 @@ $app->get("/datasets/:id", $apiCache($app, $di), function ($datasetId) use ($app
 });
 // ***
 
-// ###API -  */datasets/:id/places*
-// ###Get a List of places for a Dataset  (GET)
-// ####*JSON* - *STATIC CACHE*
+// ### API -  */datasets/:id/places*
+// ### Get a List of places for a Dataset  (GET)
+// #### *JSON* - *STATIC CACHE*
 $app->get("/datasets/:id/places", $apiCache($app, $di), function ($datasetId) use ($app, $di) {
 
     $from = 'places';
@@ -167,9 +167,9 @@ $app->get("/datasets/:id/places", $apiCache($app, $di), function ($datasetId) us
 });
 // ***
 
-// ###API -  */datasets/:id/places*
-// ###Add a Place to a dataset (PUT)[**A**]
-// ###*JSON*
+// ### API -  */datasets/:id/places*
+// ### Add a Place to a dataset (PUT)[**A**]
+// ### *JSON*
 $app->put("/datasets/:datasetId/places", function ($datasetId) use ($app, $di) {
 
     require_once 'vendor/cqatlas/cqatlas/CqUtil.php';
@@ -207,9 +207,9 @@ $app->put("/datasets/:datasetId/places", function ($datasetId) use ($app, $di) {
 });
 // ***
 
-// ###API -  */places/:id*
-// ###Get a Place  (GET)
-// ####*JSON* - *STATIC CACHE*
+// ### API -  */places/:id*
+// ### Get a Place  (GET)
+// #### *JSON* - *STATIC CACHE*
 //$app->get("/places/:id", $apiCache($app, $di), function ($placeId) use ($app, $di) {
 $app->get("/places/:id", $apiCache($app, $di), function ($placeId) use ($app, $di) {
 
@@ -219,9 +219,9 @@ $app->get("/places/:id", $apiCache($app, $di), function ($placeId) use ($app, $d
 });
 // ***
 
-// ###API -  */places/:id/near*
-// ###Get Places Near a Place (GET)
-// ####*Print JSON* - *STATIC CACHE*
+// ### API -  */places/:id/near*
+// ### Get Places Near a Place (GET)
+// #### *Print JSON* - *STATIC CACHE*
 $app->get("/places/:id/near", $apiCache($app, $di), function ($placeId) use ($app, $di) {
 
     $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
@@ -243,7 +243,7 @@ $app->get("/places/:id/near", $apiCache($app, $di), function ($placeId) use ($ap
     $output = array_merge($Response->toArray(),array('timestamp'=>time(),'results'=>$placesNearby));
     $jsonOutput = json_encode($output);
 
-    // ####Cache the Response
+    // #### Cache the Response
     $Cache = new \CQAtlas\Helpers\Cache($app, $di);
     $Cache->save($jsonOutput);
 
@@ -251,9 +251,9 @@ $app->get("/places/:id/near", $apiCache($app, $di), function ($placeId) use ($ap
 });
 // ***
 
-// ###API -  */categories*
-// ###Categories List (GET)
-// ####*JSON* - *STATIC CACHE*
+// ### API -  */categories*
+// ### Categories List (GET)
+// #### *JSON* - *STATIC CACHE*
 $app->get("/categories", $apiCache($app, $di), function () use ($app, $di) {
 
     $from = 'categories';
@@ -261,9 +261,9 @@ $app->get("/categories", $apiCache($app, $di), function () use ($app, $di) {
 });
 // ***
 
-// ###API -  ProcessRequest
-// ###Process Simple API Request
-// ####*Print JSON* - *Store in STATIC CACHE*
+// ### API -  ProcessRequest
+// ### Process Simple API Request
+// #### *Print JSON* - *Store in STATIC CACHE*
 function processRequest(\Slim\Slim $app, \Pimple $di, $from='', $where=''){
 
     $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
@@ -281,7 +281,7 @@ function processRequest(\Slim\Slim $app, \Pimple $di, $from='', $where=''){
     $output = array_merge($Response->toArray(),array('timestamp'=>time(),'results'=>$Results));
     $jsonOutput = json_encode($output);
 
-    // ####Cache the Response
+    // #### Cache the Response
     $Cache = new \CQAtlas\Helpers\Cache($app, $di);
     $Cache->save($jsonOutput);
 
@@ -289,8 +289,8 @@ function processRequest(\Slim\Slim $app, \Pimple $di, $from='', $where=''){
 }
 // ***
 
-// ###/logout
-// ###Logout Endpoint (GET)
+// ### /logout
+// ### Logout Endpoint (GET)
 // No Interface
 $app->get("/logout", function () use ($app) {
     unset($_SESSION['user']);
@@ -299,8 +299,8 @@ $app->get("/logout", function () use ($app) {
 });
 // ***
 
-// ###/login
-// ###Login Endpoint (GET)
+// ### /login
+// ### Login Endpoint (GET)
 // Show login interface
 $app->get("/login", function () use ($app) {
 
@@ -342,8 +342,8 @@ $app->get("/login", function () use ($app) {
 });
 // ***
 
-// ###/login
-// ###Login Endpoint (POST)
+// ### /login
+// ### Login Endpoint (POST)
 // Validate login.
 // Then, show login interface or redirect to destination
 $app->post("/login", function () use ($app, $di) {
@@ -379,8 +379,8 @@ $app->post("/login", function () use ($app, $di) {
 });
 // ***
 
-// ###/admin/users
-// ###Users management Endpoint (GET)[**A**]
+// ### /admin/users
+// ### Users management Endpoint (GET)[**A**]
 // Show users page to admin
 $app->get("/admin/users", $authenticate($app), function () use ($app, $di) {
     if( !Lmtl::isAdmin($di['db'],$_SESSION['user']) ){
@@ -397,9 +397,9 @@ $app->get("/admin/users", $authenticate($app), function () use ($app, $di) {
 });
 // ***
 
-// ###/publish
-// ###Publish Dataset Endpoint (POST)[**A**]
-// ###*JSON*
+// ### /publish
+// ### Publish Dataset Endpoint (POST)[**A**]
+// ### *JSON*
 // Validate & publish datasets
 # $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
 $app->post("/publish",  function () use ($app, $di) {
@@ -422,7 +422,7 @@ $app->post("/publish",  function () use ($app, $di) {
     $Response->show();
     $app->stop();
 
-    // ####Create an Excel Document (2007/.xlsx)
+    // #### Create an Excel Document (2007/.xlsx)
     $Excel = new \CQAtlas\Helpers\Excel($meta['name'],$meta['description']);
 
     $Excel->setSheet
@@ -431,30 +431,30 @@ $app->post("/publish",  function () use ($app, $di) {
           ->setData($data)
           ->save($di['uploadDir'], '05featuredemo');
 
-    // ####Upload to Google Drive
+    // #### Upload to Google Drive
     $GoogleDrive = new \CQAtlas\Helpers\GoogleDrive();
     $driveFile = $GoogleDrive->upload($di['uploadDir'], '05featuredemo');
 
-    // ####Google Drive Operation Via Server-Side Web App (AppScript::CQ Handler)
-    // #####>> Get Access Token From Spreadsheet API
+    // #### Google Drive Operation Via Server-Side Web App (AppScript::CQ Handler)
+    // ##### >> Get Access Token From Spreadsheet API
     $SpreadsheetAPI = new \CQAtlas\Helpers\SpreadsheetApi();
     $SpreadsheetAPI->authenticate($di['google_user'], $di['google_password']);
-    $scriptOutput = $SpreadsheetAPI->appScript('AKfycbzbFJq0hvgkQt6EYWJvgxS0hcnMNxbXGnee1crmCk0pxFhY2OKn',$driveFile->getId());
-    // ####Publish JSON Response
+    $SpreadsheetAPI->appScript('AKfycbzbFJq0hvgkQt6EYWJvgxS0hcnMNxbXGnee1crmCk0pxFhY2OKn',$driveFile->getId());
+    // #### Publish JSON Response
     $Response = new \CQAtlas\Helpers\Response($app->response());
     $Response->show();
 });
 // ***
 
-// ###/publish
-// ###Publish Dataset Endpoint (POST)[**A**]
-// ###*JSON*
+// ### /publish
+// ### Publish Dataset Endpoint (POST)[**A**]
+// ### *JSON*
 // Validate & publish datasets
 # $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
 $app->get("/distribute", $apiAuthenticate($app), function () use ($app, $di) {
 
-    // ####Google Drive Operation Via Server-Side Web App (AppScript::CQ-Check)
-    // #####>> Get Access Token From Spreadsheet API
+    // #### Google Drive Operation Via Server-Side Web App (AppScript::CQ-Check)
+    // ##### >> Get Access Token From Spreadsheet API
 /*    $SpreadsheetAPI = new \CQAtlas\Helpers\SpreadsheetApi();
     $SpreadsheetAPI->authenticate($di['google_user'], $di['google_password']);
     $scriptOutput = $SpreadsheetAPI->appScript('AKfycbwqmysJ6SdLNoq1_NZ_njnjC9hWMcRkVU9lYN1Di2U5ZbdE2VYZ');
@@ -551,23 +551,23 @@ $app->delete("/remove/:fileUri", $apiAuthenticate($app), function ($fileUri) use
     $Response->show();
 });
 
-// ###/upload
-// ###Upload Endpoint (GET)[**A**]
+// ### /upload
+// ### Upload Endpoint (GET)[**A**]
 // Show Upload Interface
 $app->get("/upload", $authenticate($app), function () use ($app, $di) {
     $app->render('uploadTmpl.php');
 });
 // ***
 
-// ###/upload v2
-// ###Upload Endpoint (POST)[**A**]
-// #####*For Instance, a FileData Class.*
+// ### /upload v2
+// ### Upload Endpoint (POST)[**A**]
+// ##### *For Instance, a FileData Class.*
 $app->post("/upload_v2", $apiAuthenticate($app), function () use ($app, $di) {
 
     require_once 'vendor/cqatlas/cqatlas/CqUtil.php';
     $storage = new \Upload\Storage\FileSystem($di['uploadDir']);
     $file = new \Upload\File('file_upload', $storage);
-    // ####Validation setup
+    // #### Validation setup
     $file->addValidations(array(
         new \Upload\Validation\Mimetype($di['uploadMimetypes']),
         new \Upload\Validation\Extension(
@@ -578,7 +578,7 @@ $app->post("/upload_v2", $apiAuthenticate($app), function () use ($app, $di) {
         new \Upload\Validation\Size($di['uploadMaxFileSize'])
     ));
 
-    // ###File Upload
+    // ### File Upload
     try {
         $slugName = CqUtil::slugify($file->getName());
         $file->setName( $slugName.'_'.time() );
@@ -596,7 +596,7 @@ $app->post("/upload_v2", $apiAuthenticate($app), function () use ($app, $di) {
         $app->stop();
     }
 
-    // ###Dataset Process & Validation
+    // ### Dataset Process & Validation
     $Dataset = new \Dataset( $file, $di, $app->request()->post('optionsDelimiter') );
 
     $Dataset->addValidations(array(
@@ -629,23 +629,23 @@ $app->post("/upload_v2", $apiAuthenticate($app), function () use ($app, $di) {
 // ***
 
 
-// ###/upload v1
-// ###Upload Endpoint (POST)[**A**]
-// ####*Todo: To Rewrite. Too Long & Hard to Test*
-// #####*For Instance, a FileData Class.*
+// ### /upload v1
+// ### Upload Endpoint (POST)[**A**]
+// #### *Todo: To Rewrite. Too Long & Hard to Test*
+// ##### *For Instance, a FileData Class.*
 $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
 
     require_once 'vendor/cqatlas/cqatlas/CqUtil.php';
     $storage = new \Upload\Storage\FileSystem($di['uploadDir']);
     $file = new \Upload\File('file_upload', $storage);
 
-    // ####Validation setup
+    // #### Validation setup
     $file->addValidations(array(
         new \Upload\Validation\Mimetype($di['uploadMimetypes']),
         new \Upload\Validation\Size($di['uploadMaxFileSize'])
     ));
 
-    // ###File Upload
+    // ### File Upload
     try {
         $slugName = CqUtil::slugify($file->getName());
         $file->setName( $slugName.'_'.time() );
@@ -676,7 +676,7 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
         $sourcePath =  $di['uploadDir'].'/'.$file->getName().'.'.$fileExtension;
         $Reader = new \CQAtlas\Helpers\DelimitedReader($sourcePath,0,$delimiter);
 
-    // ####Excel File
+    // #### Excel File
     }elseif( in_array($fileExtension, $di['excelExtensions']) ){
 
         $sourcePath =  $di['uploadDir'].'/'.$file->getName().'.'.$fileExtension;
@@ -690,7 +690,7 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
         return false;
     }
 
-    // ####* Check for Minimum Rows
+    // #### * Check for Minimum Rows
     if($Reader->getRowsCount()<2){
         $msg = 'Un document avec un minimum de 2 lignes est requis';
         $Response = new \CQAtlas\Helpers\Response($app->response(),400,$msg);
@@ -718,7 +718,6 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
         );
     }
 
-
     $fileData['count'] = $Reader->getRowsCount();
     $fileData['metaFields'] = array();
     $fileData['geoFields'] = array(
@@ -733,12 +732,12 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
         $flatData[] = array_values($fileData['rows'][$i]);
     }
 
-    // ####Guessing Fields Type
+    // #### Guessing Fields Type
     $fieldsCount = count($fileData['header']);
     for($i=0;$i<$fieldsCount-1;$i++){
         $fieldData = $fileData['rows'][1][ $fileData['header'][$i] ];
         $type = gettype($fieldData);
-        // #####>> IF STRING > CHECK FOR DATE
+        // ##### >> IF STRING > CHECK FOR DATE
         if($type === 'string'){
             $type = (($timestamp = strtotime($fieldData)) && (strlen($fieldData)>7))? 'date' : $type;
         }
@@ -750,22 +749,22 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
         );
     }
 
-    // ###Spatial Fields Validation
+    // ### Spatial Fields Validation
     try{
         $lonHeader = CqUtil::matchKeys($fileData['header'], array('lon','lng','longitude'));
         $latHeader = CqUtil::matchKeys($fileData['header'], array('lat','latitude'));
         $locationHeader = CqUtil::matchKeys($fileData['header'], array('adresse','address','addr','location','localisation'));
         if( $lonHeader === false || $latHeader === false){
             if( $locationHeader === false ){
-                // #####>> STOP - No Location Field Detected
+                // ##### >> STOP - No Location Field Detected
                 throw new Exception('Aucune entête spatiale (lon,lat ou adresse)');
             }
-            // #####Data Need Geocoding! Now on the Client Side ...Easier on Quota
+            // ##### Data Need Geocoding! Now on the Client Side ...Easier on Quota
             $fileData['geoFields']['locField'] = $locationHeader;
             $fileData['geoFields']['geocoded'] = 0;
         }else
         {
-            // ####Lng/Lat Validation
+            // #### Lng/Lat Validation
             require 'models/geo.php';
             $llErrors = 0;
             $llValids = 0;
@@ -847,16 +846,16 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
 });
 // ***
 
-// ###/private/about
-// ###"TEST" ABOUT PRIVATE (GET)[**A**]
+// ### /private/about
+// ### "TEST" ABOUT PRIVATE (GET)[**A**]
 // Show Private/About Interface
 $app->get("/private/about", $authenticate($app), function () use ($app) {
     $app->render('privateAbout.php');
 });
 // ***
 
-// ###/buildTaxonomy
-// ###Build Taxonomy Endpoint (GET)
+// ### /buildTaxonomy
+// ### Build Taxonomy Endpoint (GET)
 // Build Categories Taxonomy on CartoDB via a JSON file
 $app->get("/buildTaxonomy", function () use ($app, $di) {
 
@@ -892,8 +891,8 @@ $app->get("/buildTaxonomy", function () use ($app, $di) {
 });
 // ***
 
-// ###/buildCategories
-// ###Build Categories Endpoint (GET)
+// ### /buildCategories
+// ### Build Categories Endpoint (GET)
 // Build Categories on CartoDB via an Excel file
 $app->get("/buildCategories", function () use ($app, $di) {
 
@@ -936,8 +935,8 @@ $app->get("/buildCategories", function () use ($app, $di) {
 });
 // ***
 
-// ###/montest###
-// ####Playground ;)####
+// ### /montest###
+// #### Playground ;)####
 $app->get("/check_drive", function () use ($app, $di) {
     echo '<br>TEST DRIVE!';
 
@@ -946,11 +945,11 @@ $app->get("/check_drive", function () use ($app, $di) {
 // ***
 
 
-// ###/montest###
-// ####Playground ;)####
+// ### /montest###
+// #### Playground ;)####
 $app->get("/select_all", function () use ($app, $di) {
     echo '<br>TEST!';
-    $date = new DateTime();
+    //$date = new DateTime();
 
     $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
 
