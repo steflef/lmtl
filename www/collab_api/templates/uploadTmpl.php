@@ -41,7 +41,6 @@
                  ng-controller="UploadCtrl"
                  ng-show="($parent.$$childTail.uData.length==0)"
                  style="border-left: 8px solid #ccc;padding-left: 16px">
-                <!--<button class="btn" ng-click="viewScope()">TEST</button>-->
 
                 <div class="alert alert-error" ng-show="(status == 403)">
                     <strong>Votre session est expirée!</strong>
@@ -110,7 +109,7 @@
 
             <div ng-show="(step == 2)">
                 <div  id="grid" name="grid">
-                    <div ng-show="(uData.length>0)">
+                    <div ng-show="(uData.features.length>0)">
                         <div class="hero-unit" style="padding:10px 20px;">
                             <h4>Complétez l'activation du jeu de données</h4>
                             <p>Utilisez les onglets pour naviguer et compléter les métadonnées pour ensuite procéder à la publication.</p>
@@ -125,12 +124,13 @@
                                     <caption class="hide">Aperçu des données (3 premières lignes)</caption>
                                     <thead>
                                     <tr>
-                                        <th ng-repeat="item in uHeaders">{{item.title}}</th>
+                                        <!--<th ng-repeat="item in uHeaders">{{item.title}}</th>-->
+                                        <th ng-repeat="item in uMetadata.properties">{{item.title}}</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="item in dataExtract">
-                                        <td ng-repeat="sub in item">{{sub}}</td>
+                                        <td ng-repeat="p in uMetadata.properties">{{item.properties[p.title]}}</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -148,7 +148,7 @@
             </div>
 
             <div ng-show="(step == 3)">
-                <div ng-show="(uData.length>0)">
+                <div ng-show="(uData.features.length>0)">
                     <div class="hero-unit" style="padding:10px 20px;">
                         <h4>Géocodage</h4>
                         <p  ng-show="(uMetadata.geocoded==1)">Vos données sont géolocalisées.</p>
@@ -156,14 +156,14 @@
                     </div>
 
                     <div ng-show="(uMetadata.geocoded==0)">
-                        <p>Vous avez <strong>{{uData.length}} lieux </strong>à géocoder. Nous estimons le temps nécessaire au traitement de vos données à <strong>{{uData.length*0.65}} secondes</strong>.</p>
+                        <p>Vous avez <strong>{{uData.features.length}} lieux </strong>à géocoder. Nous estimons le temps nécessaire au traitement de vos données à <strong>{{uData.length*0.65}} secondes</strong>.</p>
                         <p>Le champs "<strong>{{uMetadata.locField}}</strong>" à été identifié pour les données de localisation.</p>
                         <p>L'opération de géocodage ajoutera les champs longitude et latitude à votre jeu de données.</p>
                         <hr>
                         <div>
                             <h5>{{geoConsole}}</h5>
                             <div class="progress">
-                                <div class="bar" ng-style="geocodingPogress" style="width: 0%;"></div>
+                                <div class="bar" ng-style="geocodingProgress" style="width: 0%;"></div>
                             </div>
                             <textarea class="span12"
                                       name="geocodeConsole"
@@ -185,7 +185,7 @@
                 </div>
             </div>
 
-            <div ng-show="(step==4)">
+            <div ng-show="(step == 4)">
                 <div class="hero-unit" style="padding:10px 20px;">
                     <h4>Métadonnées</h4>
                     <p>Données sur votre jeu de données. Le nom et la description seront utilisés pour la recherche des données.</p>
@@ -195,26 +195,26 @@
                     <div class="control-group"><h4>Jeu de données</h4></div>
                     <div id="md" class="control-group info">
 
-                        <label for="" class="control-label">{{uForm.name.label}}</label>
+                        <label for="" class="control-label">{{uMetadata.form.name.label}}</label>
                         <div class="controls">
-                            <input class="input-xxlarge" name="r_name" type="text" ng-model="uForm.name.value" required ng-minlength="5" placeholder="Nom du jeu de données ...">
+                            <input class="input-xxlarge" name="r_name" type="text" ng-model="uMetadata.form.name.value" required ng-minlength="5" placeholder="Nom du jeu de données ...">
                             <span class="help-inline" ng-show="metaForm.r_name.$error.required">Requis</span>
                             <span class="help-inline" ng-show="metaForm.r_name.$error.minlength">Minimum de 5 caractères</span>
                         </div>
                     </div>
                     <div class="control-group info">
-                        <label for="" class="control-label">{{uForm.desc.label}}</label>
+                        <label for="" class="control-label">{{uMetadata.form.desc.label}}</label>
                         <div class="controls">
-                            <textarea rows="4" class="input-xxlarge" name="r_description" ng-model="uForm.desc.value" required ng-minlength="10" placeholder="Description du jeu de données ..."></textarea>
+                            <textarea rows="4" class="input-xxlarge" name="r_description" ng-model="uMetadata.form.desc.value" required ng-minlength="10" placeholder="Description du jeu de données ..."></textarea>
                             <span class="help-inline" ng-show="metaForm.r_description.$error.required">Requis</span>
                             <span class="help-inline" ng-show="metaForm.r_description.$error.minlength">Minimum de 10 caractères</span>
                         </div>
                     </div>
 
                     <div class="control-group info">
-                        <label for="" class="control-label">{{uForm.attributions.label}}</label>
+                        <label for="" class="control-label">{{uMetadata.form.attributions.label}}</label>
                         <div class="controls">
-                            <textarea rows="4" class="input-xxlarge" name="r_attributions" ng-model="uForm.attributions.value" required ng-minlength="10" placeholder="Provenance des données ..."></textarea>
+                            <textarea rows="4" class="input-xxlarge" name="r_attributions" ng-model="uMetadata.form.attributions.value" required ng-minlength="10" placeholder="Provenance des données ..."></textarea>
                             <span class="help-inline" ng-show="metaForm.r_attributions.$error.required">Requis</span>
                             <span class="help-inline" ng-show="metaForm.r_attributions.$error.minlength">Minimum de 10 caractères</span>
                         </div>
@@ -243,8 +243,7 @@
                     <div class="control-group info">
                         <label for="" class="control-label">Étiquette</label>
                         <div class="controls">
-                            <select ng-model="uForm.label.value" ng-options='item.title as item.title for item in uHeaders'>
-                                <!--<option ng-repeat="item in uHeaders" value="{{item.title}}">{{item.title}}</option>-->
+                            <select ng-model="uMetadata.form.label.value" ng-options='item.title as item.title for item in uMetadata.properties'>
                             </select>
                             <span class="help-inline">Champs utilisé pour les étiquettes cartographiques</span>
                             <input type="hidden" id="r_label_value" name="r_label_value" value="">
@@ -253,7 +252,7 @@
                     <div class="control-group info">
                         <label for="" class="control-label">Catégories</label>
                         <div class="controls">
-                            <select ng-model="uForm.field_category.value" ng-options='item.title as item.title for item in uHeaders'>
+                            <select ng-model="uMetadata.form.field_category.value" ng-options='item.title as item.title for item in uMetadata.properties'>
                                 <option value="">Hérite du jeu de données</option>
                             </select>
                             <span class="help-inline">Utilisation d'un attribut pour la catégorisation?</span>
@@ -262,7 +261,7 @@
                     </div>
 
                     <div class="control-group"><h4>Description des Champs <small>(facultatif)</small></h4></div>
-                    <div class="control-group" ng-repeat="item in uHeaders">
+                    <div class="control-group" ng-repeat="item in uMetadata.properties">
                         <label class="control-label" for="input{{item.title}}">{{item.title}}</label>
                         <div class="controls">
                             <input class="input-mini" disabled="disabled" type="text" id="input{{item.title}}" placeholder="{{item.type}}" value="{{item.type}}">
@@ -305,7 +304,7 @@
 
         </div> <!--GridCtrl-End-->
 
-        <div ng-show="(step==5)">
+        <div ng-show="(step == 5)">
 
             <div class="hero-unit" style="padding:10px 20px;">
                 <h4>Droits & licence</h4>
@@ -329,7 +328,7 @@
                 </fieldset>
             </form>
         </div>
-        <div ng-show="(step==6)">
+        <div ng-show="(step == 6)">
             <div class="hero-unit" style="padding:10px 20px;">
                 <h4>Publication</h4>
                 <p>Les données publiées seront validées par Collectif Quartier qui se réserve le droit de non-publication en cas de doute sur l'exactitude des données, sur les droits associées ou sur la nature des données.</p>

@@ -742,6 +742,8 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
             $type = (($timestamp = strtotime($fieldData)) && (strlen($fieldData)>7))? 'date' : $type;
         }
 
+        $type = ($type === 'NULL')?'string':$type;
+
         $fileData['metaFields'][] = array(
             'title' => $fileData['header'][$i],
             'type' => $type,
@@ -768,25 +770,13 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
             require 'models/geo.php';
             $llErrors = 0;
             $llValids = 0;
-            $llErrorsObjs = array();
-
             $rowCount = 0;
-/*            foreach($fileData['rows'] as $row){
-
-                if(Geo::geo_utils_is_valid_longitude($row[$lonHeader]) && Geo::geo_utils_is_valid_latitude($row[$latHeader])){
-                    $llValids ++;
-                }else{
-                    $llErrors ++;
-                    $llErrorsObjs[] = '('.$rowCount.': '.$row[$lonHeader].','.$row[$latHeader].')';
-                }
-                $rowCount ++;
-            }*/
-
+            $llErrorsObjs = array();
 
             foreach($fileData['geoJson']['features'] as &$row){
 
                 if(Geo::geo_utils_is_valid_longitude($row['properties'][$lonHeader]) && Geo::geo_utils_is_valid_latitude($row['properties'][$latHeader])){
-                    $row['geometry'] = array((float)$row['properties'][$lonHeader],(float)$row['properties'][$latHeader]);
+                    $row['geometry']['coordinates'] = array( (float)$row['properties'][$lonHeader], (float)$row['properties'][$latHeader]);
                     $llValids ++;
                 }else{
                     $llErrors ++;
@@ -833,11 +823,12 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
     $metadata['form']['name']['value'] = $file->getName();
 
     $data = array(
-        'data' => $flatData,
-        'geoJson' =>$fileData['geoJson'],
-        'headers' =>$fileData['metaFields'],
+        //'data' => $flatData,
+        'geojson' =>$fileData['geoJson'],
+        //'headers' =>$fileData['metaFields'],
         'metadata' => $metadata
     );
+
 
     $Response = new \CQAtlas\Helpers\Response($app->response());
     $Response->setContentType('text/html'); #iFrame Fix

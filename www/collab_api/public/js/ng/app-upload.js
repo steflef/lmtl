@@ -108,7 +108,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             return typeof text;
         }
     })
-    .controller('StepperCtrl', function($rootScope, $scope, $http, $location, $anchorScroll) {
+    .controller('StepperCtrl', function($rootScope, $scope, $http) {
 
         $scope.safeApply = function(fn) {
             var phase = this.$root.$$phase;
@@ -144,14 +144,14 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         };
 
         // Listeners
-        $scope.$on('nextStep', function ($scope) {
+        $scope.$on('nextStep', function () {
             if(self.step + 1 <= self.maxSteps){
                 self.step ++;
                 self.changed();
             }
         });
 
-        $scope.$on('prevStep', function ($scope) {
+        $scope.$on('prevStep', function () {
             if(self.step - 1 > 0){
                 self.step --;
                 self.changed();
@@ -163,12 +163,12 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             self.changed();
         });
 
-        $scope.$on('clearData', function ($scope) {
+        $scope.$on('clearData', function () {
             self.step = 1;
             self.changed();
         });
 
-        $scope.$on('newData', function ($scope, oData) {
+        $scope.$on('newData', function () {
             self.toStep(2);
         });
 
@@ -179,14 +179,14 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             }
         });
 
-        $scope.$on('load', function ($scope) {
+        $scope.$on('load', function () {
             self.showLoader();
         });
-        $scope.$on('loadEnd', function ($scope) {
+        $scope.$on('loadEnd', function () {
             self.hideLoader();
         });
 
-        $scope.$watch('step', function(newValue, oldValue) {
+        $scope.$watch('step', function(newValue) {
             $rootScope.$broadcast("newStepAfter", {step:newValue});
         });
 
@@ -224,7 +224,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             };
 
             // Check empty required fields
-            var form  = self.$$childTail.uForm;
+            var form  = self.$$childTail.uMetadata.form;
             if((form.name.value.length< 5 || form.desc.value.length< 5 || form.attributions.value.length)< 5){
                 results.msg = "Il manque des champs requis ( onglet Métadonnees ).";
                 return results;
@@ -249,21 +249,11 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 
         $scope.preValidate = function(){
 
-            console.log(self);
-            var results = {
-                msg : "",
-                status : "error"
-            };
-
-            // Check empty required fields
             var child = self.$$childTail;
-            var form  = child.uForm;
 
-            //console.log(form);
-
-            child.setCheckStatus("name", (form.name.value.length > 5 ));
-            child.setCheckStatus("description", (form.desc.value.length > 5 ));
-            child.setCheckStatus("source", (form.attributions.value.length > 5 ));
+            child.setCheckStatus("name", (child.uMetadata.form.name.value.length > 5 ));
+            child.setCheckStatus("description", (child.uMetadata.form.desc.value.length > 5 ));
+            child.setCheckStatus("source", (child.uMetadata.form.attributions.value.length > 5 ));
             child.setCheckStatus("geo", (child.uMetadata.geocoded == 1 ));
 
             child.setCheckStatus("categories", (child.cat.hash.length > 0 ));
@@ -395,6 +385,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             // NEED CONVERSION FROM text/html to json
             var oData = angular.fromJson(resp);
             console.log('RESPONSE:');
+            //console.log(resp);
             console.log(oData);
 
             // SESSION EXPIRED
@@ -503,7 +494,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         $scope.dataExtract = [];
         $scope.geoConsole = "Appuyez sur le bouton geocodage pour lancer l'operation.";
         $scope.geoLog = "------------------------------\nConsole de geocodage\n------------------------------";
-        $scope.geocodingPogress = {width:'0%'};
+        $scope.geocodingProgress = {width:'0%'};
         $scope.geocodingErrors = 0;
         $scope.geocodingBtn = {isDisabled:false};
 
@@ -525,72 +516,29 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         $scope.$on('newUpload', function () {
             //console.log("newUpload LISTENER >> GridCtrl");
             self.uData = [];
-            self.uHeaders = [];
             self.uMetadata = [];
             self.dataExtract = [];
-
-            self.uLocation = [];
-            self.uGeoJson  = [];
         });
 
         // ### newData *Listener*
         $scope.$on('newData', function ($scope, oData) {
 
-            //console.log(oData);
-            self.uData = oData.data;
-            self.uHeaders = oData.headers;
+            self.uData = oData.geojson;
             self.uMetadata = oData.metadata;
-            self.uForm = oData.metadata['form'];
-            self.uForm.label.value = self.uHeaders[0].title;
-
-            self.uGeoJson = oData.geoJson;
+            // Champ Label Promise >> blank otherwise
+            self.uMetadata.form.label.value = self.uMetadata.properties[0].title;
 
             //Extract
             for(var i=0;i<3;i++){
-                self.dataExtract[i] = self.uData[i];
+                self.dataExtract[i] = self.uData.features[i];
             }
 
             if(self.uMetadata.geocoded == 0){
+
                 self.geocoder = new google.maps.Geocoder();
-            }
+            }else{
 
-            if(self.uMetadata.geocoded == 1){
-                // Build uLocation
-                var latFieldIndex = 0;
-                var lonFieldIndex = 0;
-                var metaLatField = self.uMetadata.latField;
-                var metaLonField = self.uMetadata.lonField;
-                _.each(self.uHeaders, function(element, index){
-                    if(element.title == metaLatField){
-                        latFieldIndex = index;
-                    }
-                    if(element.title == metaLonField){
-                        lonFieldIndex = index;
-                    }
-                });
-
-                _.each(self.uGeoJson, function(element){
-                    var geometry = {
-                        type:"Point",
-                        coordinates: [element[self.uMetadata.lonField],element[self.uMetadata.latField]]
-                    };
-                    element['geometry'] = geometry;
-                });
-
-                _.each(self.uData, function(element){
-                    var geometry = {
-                        type:"Point",
-                        coordinates: [element[lonFieldIndex],element[latFieldIndex]]
-                    };
-                    element['geometry'] = geometry;
-
-                    self.uLocation.push({
-                        lat:element[latFieldIndex],
-                        lon:element[lonFieldIndex]//,
-                        //label: "label"
-                    });
-                });
-                $rootScope.$broadcast("setMarkers", self.uLocation);
+                $rootScope.$broadcast("setMarkers", self.uData.features);
             }
 
             self.safeApply();
@@ -604,53 +552,39 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             }
         });
 
-        $scope.$on('clearData', function ($scope) {
+        $scope.$on('clearData', function () {
             self.uData = [];
-            self.uHeaders = [];
             self.uMetadata = [];
             self.dataExtract = [];
-            self.uLocation = [];
-            self.uGeoJson = [];
 
             self.geoConsole = "";
             self.geoLog = "";
             self.geoIndex = 0;
+            self.geocodingProgress.width = "0%";
+            self.geocodingBtn.isDisabled = false;
         });
 
         $scope.$on('geocoded', function ($scope, errorsCount) {
-            console.log("==== GEOCODED ====");
-            console.log(self.uData);
-            console.log(self.uHeaders);
-            console.log(self.uLocation);
-
+            console.log("==== GEOCODED : "+errorsCount +" ====");
             if(errorsCount == 0){
                 self.uMetadata['geocoded'] = 1;
-                self.$broadcast('setMarkers', self.uLocation);
-                self.bounds();
-            }
+                self.geocodingBtn.isDisabled = false;
 
-            //New Extract
-            self.dataExtract = [];
-            for(var i=0;i<3;i++){
-                self.dataExtract[i] = self.uData[i];
-            }
+                self.safeApply();
 
-            //self.$apply();
-            self.safeApply();
+                self.$broadcast('setMarkers', self.uData.features);
+                //setTimeout( self.bounds(),800 );
+            }
         });
 
         $scope.$on('setMarkers', function ($scope, Places) {
+            console.log("==== setMarkers ====");
+            console.log(Places);
+
             if (self.map.hasLayer(self.markers)) {
                 self.map.removeLayer(self.markers);
                 self.markers = null;
             }
-
-            var headers = [];
-
-            _.each(self.uHeaders, function(element){
-                headers.push(element.title);
-            });
-
 
             self.markers = new L.MarkerClusterGroup({showCoverageOnHover:false});
             //self.markers.on('click', function (a) {
@@ -666,34 +600,36 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                 });
             });*/
           var t_bounds = [];
+            var placesIndex = 0;
             _.each(Places, function(element, index){
                 var attributes = [];
-                var headIndex = 0;
-                _.every(headers, function(head){
-                    attributes.push(head + ": "+ self.uData[index][headIndex] +"<br>");
-                    if(headIndex > 3 ){
+                var propertiesIndex = 0;
+                var pairs = _.pairs(element.properties);
+                _.every(pairs, function(p){
+                    attributes.push(p[0] + ": "+ p[1] +"<br>");
+                    if(propertiesIndex > 3 ){
                         attributes.push("...<br>");
                         return false;
                     }
-                    headIndex ++;
+                    propertiesIndex ++;
                     return true;
                 });
 
-                var title = attributes.join('');
-
-                t_bounds.push(new L.LatLng(element.lat, element.lon));
-                var marker = new L.Marker(new L.LatLng(element.lat, element.lon), { title:title,index:index });
-                marker.bindPopup(title);
+                var LL = new L.LatLng(element.geometry.coordinates[1], element.geometry.coordinates[0]);
+                t_bounds.push(LL);
+                var marker = new L.Marker(LL, { title:attributes.join(''),index:index });
+                marker.bindPopup(attributes.join(''));
                 self.markers.addLayer(marker);
+                placesIndex ++;
             });
 
             self.map.addLayer(self.markers);
             if (t_bounds.length == 1) {
-                //console.log("Set View");
                 self.map.setView(t_bounds[0], 15);
             }
 
             self.t_bounds = t_bounds;
+            setTimeout(self.bounds(),800);
         });
 
         $scope.bounds = function(){
@@ -704,16 +640,18 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         $scope.geocode = function () {
 
             self.disable();
-            var idx = self.findHeaderIndex( self.uMetadata.locField );
+            var locationField = self.uMetadata.locField;
             var pos = self.geoIndex || 0;
-            var l = self.uData.length -1;
+            var l = self.uData.features.length;
             var timer = 800;
+            var responseCount = 0;
 
             (function () {
-                var adr = self.uData[pos][idx];
+                var adr = self.uData.features[pos].properties[locationField];
                 var targetRow = pos;
 
                 self.geocoder.geocode( { 'address': adr}, function(results, status) {
+
                     if (status == google.maps.GeocoderStatus.OK) {
                         var lon = results[0].geometry.location.lng();
                         var lat = results[0].geometry.location.lat();
@@ -743,14 +681,16 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                                 "city" : city,
                                 "service" : "Google"
                             };
-                        self.uLocation[targetRow]= location;
 
+                        self.uData.features[targetRow].geometry.coordinates = [lon,lat];
+                        self.uData.features[targetRow]._geo = location;
 
-                       // self.uData[targetRow].splice(self.uData.length,0,lon,lat);
                         self.geoConsole = "ID:"+targetRow+" ["+adr+"] : ("+lon+","+lat+")";
                         self.geoLog += "\n" + self.geoConsole;
+                        self.safeApply();
                         timer = 800;
                         self.geoIndex = pos;
+                        responseCount ++;
                         pos ++;
 
                     } else
@@ -762,21 +702,37 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                         }else{
                             self.geoConsole = "=> ID:"+pos+" ("+adr+") Erreur: "+ status;
                             self.geoLog += "\n" + self.geoConsole;
-                            self.uData[targetRow].push('');
-                            self.uData[targetRow].push('');
+                            //self.uData[targetRow].push('');
+                            //self.uData[targetRow].push('');
                             self.geocodingErrors ++;
+                            responseCount ++;
                             pos ++;
                         }
                     }
                 });
 
-                self.geocodingPogress.width = Math.round((pos/(l-1))*100) + "%";
+                self.geocodingProgress.width = Math.round((responseCount/(l-1))*100) + "%";
                 self.safeApply();
 
-                if (pos < l) {
+                if (pos < l-1) {
+                   // console.log("Responses:" + responseCount);
                     self.geoTimeout = setTimeout(arguments.callee, timer);
                 } else {
-                    self.$broadcast('geocoded', self.geocodingErrors);
+                    //console.log("END");
+                    //self.safeApply();
+                    //self.$broadcast('geocoded', self.geocodingErrors);
+                    var interval = setInterval(
+                        function(){
+                            console.log("++ Responses:" + responseCount);
+                            self.geocodingProgress.width = Math.round((responseCount/(l-1))*100) + "%";
+                            self.safeApply();
+                            if(responseCount == l){
+                                self.$broadcast('geocoded', self.geocodingErrors);
+                                responseCount = 0;
+                                clearInterval(interval);
+                            }
+
+                        },800);
                 }
             })();
         };
