@@ -5,15 +5,15 @@
 /docs
 
 # Ext
-#/ext/Mustache/
-#/ext/Slim/
-#/ext/cssmin/
-#/ext/htmlpuifier/
-#/ext/jsmin/
-#/ext/propel/
+/ext/Mustache/
+/ext/Slim/
+/ext/cssmin/
+/ext/htmlpuifier/
+/ext/jsmin/
+/ext/propel/
 
 # Config
-#/www/collab_api/cq_atlas/config/
+/www/collab_api/cq_atlas/config/
 
 # Vendor
-#/www/collab_api/vendor/
+/www/collab_api/vendor/
