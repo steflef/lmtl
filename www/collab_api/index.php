@@ -405,31 +405,30 @@ $app->get("/admin/users", $authenticate($app), function () use ($app, $di) {
 $app->post("/publish",  function () use ($app, $di) {
 
     # Slim Request Object
-    $reqBody = json_decode( $app->request()->getBody(), true );
-    $meta = $reqBody['metadata'];
-    $data = $reqBody['data'];
-    $headers = $reqBody['headers'];
-
-
+    $reqBody = json_decode( $app->request()->getBody() );
+    $meta = $reqBody->metadata;
+    $data = $reqBody->geojson;
+    $properties = $reqBody->properties;
+/*
     echo '<pre><code>';
     print_r($meta);
     print_r($data);
-    print_r($headers);
-    print_r($reqBody['location']);
-    print_r($reqBody['form']);
+    print_r($properties);
     echo '</code></pre>';
     $Response = new \CQAtlas\Helpers\Response($app->response());
     $Response->show();
-    $app->stop();
+    $app->stop();*/
 
     // #### Create an Excel Document (2007/.xlsx)
-    $Excel = new \CQAtlas\Helpers\Excel($meta['name'],$meta['description']);
+    $Excel = new \CQAtlas\Helpers\Excel($meta->nom,$meta->description);
 
-    $Excel->setSheet
+    $Excel->setSheet()
           ->setMetas($meta)
-          ->setDataHeaders($headers)
-          ->setData($data)
+          ->setDataHeaders($properties, $data->features)
+          ->setData($data->features, $properties)
+          ->setProperties($properties)
           ->save($di['uploadDir'], '05featuredemo');
+
 
     // #### Upload to Google Drive
     $GoogleDrive = new \CQAtlas\Helpers\GoogleDrive();
@@ -538,6 +537,9 @@ exit;
 });
 // ***
 
+// ### /remove/:fileUri
+// ### Remove Endpoint (DELETE)[**A**]
+// Rewrite Uploaded File
 $app->delete("/remove/:fileUri", $apiAuthenticate($app), function ($fileUri) use ($app, $di) {
 
     $Response = new \CQAtlas\Helpers\Response($app->response());
@@ -550,6 +552,7 @@ $app->delete("/remove/:fileUri", $apiAuthenticate($app), function ($fileUri) use
 
     $Response->show();
 });
+// ***
 
 // ### /upload
 // ### Upload Endpoint (GET)[**A**]
@@ -559,77 +562,7 @@ $app->get("/upload", $authenticate($app), function () use ($app, $di) {
 });
 // ***
 
-// ### /upload v2
-// ### Upload Endpoint (POST)[**A**]
-// ##### *For Instance, a FileData Class.*
-$app->post("/upload_v2", $apiAuthenticate($app), function () use ($app, $di) {
-
-    require_once 'vendor/cqatlas/cqatlas/CqUtil.php';
-    $storage = new \Upload\Storage\FileSystem($di['uploadDir']);
-    $file = new \Upload\File('file_upload', $storage);
-    // #### Validation setup
-    $file->addValidations(array(
-        new \Upload\Validation\Mimetype($di['uploadMimetypes']),
-        new \Upload\Validation\Extension(
-            array_merge(
-                $di['delimitedExtensions'],
-                $di['excelExtensions'])
-        ),
-        new \Upload\Validation\Size($di['uploadMaxFileSize'])
-    ));
-
-    // ### File Upload
-    try {
-        $slugName = CqUtil::slugify($file->getName());
-        $file->setName( $slugName.'_'.time() );
-        $file->upload();
-
-    } catch (\Exception $e) {
-        $errors = $file->getErrors();
-        if(empty($errors)){
-            $errors[] = $e->getMessage();
-        }
-        $msg = $errors[0] . ' ['.$file->getMimetype().']';
-        $Response = new \CQAtlas\Helpers\Response($app->response(),400,$msg);
-        $Response->setContentType('text/html'); #iFrame Fix
-        $Response->show();
-        $app->stop();
-    }
-
-    // ### Dataset Process & Validation
-    $Dataset = new \Dataset( $file, $di, $app->request()->post('optionsDelimiter') );
-
-    $Dataset->addValidations(array(
-        new \Dataset\Validation\Rows($di['datasetMinRows']), # Min 2 Rows
-        new \Dataset\Validation\Headers(), #First Row = String
-        new \Dataset\Validation\Spatial() #Check For Spatial Fields (lon, lat, address)
-    ));
-
-    try{
-        $Dataset->process();
-        # 1- Create Reader
-        # 2- Validate
-        # 3- Extract Meta setMetadata()
-        # 4- Extract Fields Metadata setFieldsMeta()
-        # 5- Extract Spatial Fields setSpatial()
-        # 6- Json Dump Dataset->toJson(), ->toArray()
-
-    }catch (\Exception $e){
-        $Response = new \CQAtlas\Helpers\Response($app->response(),400,$e->getMessage());
-        $Response->setContentType('text/html'); #iFrame Fix
-        $Response->show();
-        $app->stop();
-    }
-
-    $Response = new \CQAtlas\Helpers\Response($app->response());
-    $Response->setContentType('text/html'); #iFrame Fix
-    $output = array_merge( $Response->toArray(),$Dataset->toArray() );
-    echo json_encode($output);
-});
-// ***
-
-
-// ### /upload v1
+// ### /upload
 // ### Upload Endpoint (POST)[**A**]
 // #### *Todo: To Rewrite. Too Long & Hard to Test*
 // ##### *For Instance, a FileData Class.*
@@ -805,15 +738,15 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
 
 
     $metadata = array(
-        'name'=> '',
-        'description' => '',
+        //'name'=> '',
+        //'description' => '',
         'fileName'=> $file->getName(),
         'fileMime'=> $fileMime,
         'fileExtension'=> $file->getExtension(),
         'fileSize'=> $fileSize.' kb',
-        'fileHash'=> md5_file($di['uploadDir'].'/'.$file->getName().'.'.$file->getExtension()),
-        'fileId' => sha1($file->getName() . '_' . $_SESSION['user']),
-        'fileCreated' => time(),
+        //'fileHash'=> md5_file($di['uploadDir'].'/'.$file->getName().'.'.$file->getExtension()),
+        //'fileId' => sha1($file->getName() . '_' . $_SESSION['user']),
+        //'fileCreated' => time(),
         'fileUri' => sprintf('%s.%s',$file->getName(),$file->getExtension()),
         'properties' => $fileData['metaFields']
     );
@@ -823,9 +756,7 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
     $metadata['form']['name']['value'] = $file->getName();
 
     $data = array(
-        //'data' => $flatData,
         'geojson' =>$fileData['geoJson'],
-        //'headers' =>$fileData['metaFields'],
         'metadata' => $metadata
     );
 
@@ -834,14 +765,6 @@ $app->post("/upload", $apiAuthenticate($app), function () use ($app, $di) {
     $Response->setContentType('text/html'); #iFrame Fix
     $output = array_merge($Response->toArray(),$data);
     echo json_encode($output);
-});
-// ***
-
-// ### /private/about
-// ### "TEST" ABOUT PRIVATE (GET)[**A**]
-// Show Private/About Interface
-$app->get("/private/about", $authenticate($app), function () use ($app) {
-    $app->render('privateAbout.php');
 });
 // ***
 
@@ -923,136 +846,6 @@ $app->get("/buildCategories", function () use ($app, $di) {
     echo '<pre><code>';
     print_r($curlResult);
     echo '</code></pre>';
-});
-// ***
-
-// ### /montest###
-// #### Playground ;)####
-$app->get("/check_drive", function () use ($app, $di) {
-    echo '<br>TEST DRIVE!';
-
-
-});
-// ***
-
-
-// ### /montest###
-// #### Playground ;)####
-$app->get("/select_all", function () use ($app, $di) {
-    echo '<br>TEST!';
-    //$date = new DateTime();
-
-    $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
-
-
-    try{
-        $results = $CartoDB->selectAll('places');
-    }catch (Exception $e){
-        echo "OUPS $e";
-    }
-    echo '<pre><code>';
-    print_r($results);
-    echo '</code></pre>';
-    try{
-        $results = $CartoDB->selectAll('places',"WHERE place_id=2");
-    }catch (Exception $e){
-        echo "OUPS $e";
-    }
-
-    echo '<pre><code>';
-    print_r($results);
-    echo '</code></pre>';
-
-});
-// ***
-
-$app->get("/montest", function () use ($app, $di) {
-    echo '<br>MonTest OK!';
-    $date = new DateTime();
-
-    echo '<br>'.$date->getTimestamp();
-    echo '<br>'.time();
-
-    $fakeDatasets = array(
-        'fakeName' => array(
-            'bbox_4326' => 'ST_MakeEnvelope(45.702888, -73.476921, 45.414650, -73.905762, 4326)',
-            'the_geom'  => 'ST_MakeEnvelope(45.702888, -73.476921, 45.414650, -73.905762, 4326)',
-            'collection_id' => 1,
-            'created_by' => 1,
-            //'dataset_id' => array('type' =>'number'),
-            'dataset_extra_fields' => '{["champ_1","champ_2"]}',
-            'desc_en'   => 'Description EN',
-            'desc_fr'   => 'Description EN',
-            'google_drive_id' =>  'wfqlwjrfl342324',
-            'label'     => 'LABEL ....',
-            'licence'   => 'Licence',
-            'name_en'   => "L'autre École ç",
-            'name_fr'   => 'Name FR',
-            'privacy'   => 0,
-            'slug'      => 'name_fr',
-            'status'    => 1,
-            'version'   => 1,
-            'primary_category_id'   => 1,
-            'secondary_category_id' => 2,
-            'tertiary_category_id'  => 3//,
-            //  'file_format'   => array('type' =>'string'),
-            //  'file_hash'     => array('type' =>'string'),
-            //  'file_mime'     => array('type' =>'string'),
-            //  'file_size'      => array('type' =>'string'),
-            //  'file_uri'      => array('type' =>'string')
-        )
-    );
-    $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
-    /*
-        try{
-            $curlDatasets = $CartoDB->batchInsert('datasets',$fakeDatasets);
-        }catch (Exception $e){
-            echo "OUPS $e";
-        }
-
-        echo '<pre><code>';
-        print_r($curlDatasets);
-        echo '</code></pre>';*/
-
-    $fakePlaces = array(
-        'fakeName' => array(
-            //'bbox_4326' => array('type'=> 'geom'),
-            'the_geom'  => 'ST_SetSRID(ST_Point(-73.50246,45.028293),4326)',
-            'address'   => '5320 Saint-Denis',
-            'city'   => 'Montreal',
-            'longitude'   => -73.50246,
-            'latitude'   => 45.628293,
-            'postal_code'   => 'H2J 2M3',
-            'tel_number'   => '514-273-2008',
-            'website'   => 'http://steflef.com',
-            'collection_id' => 1,
-            'created_by' => 1,
-            'dataset_id'   => 1,
-            'desc_en'   => 'Description EN',
-            'desc_fr'   => 'Description FR',
-            'label'   => 'Label',
-            'name_en'   => 'Home',
-            'name_fr'   => 'Maison',
-            //'place_id'   => 'Description EN',
-            'privacy'   => 0,
-            'slug'   => 'maison',
-            'status'   => 1,
-            'version'   => 1,
-            'primary_category_id'   => 1,
-            'secondary_category_id'   => 2,
-            'tags'   => '{"champ_1":"Ma maison","champ_2","Stephane Lefebvre"}'
-        )
-    );
-    try{
-        $results = $CartoDB->batchInsert('places',$fakePlaces);
-    }catch (Exception $e){
-        echo "OUPS $e";
-    }
-
-    echo '<pre><code>';
-    print_r($results);
-    echo '</code></pre>';
-
 });
 // ***
 

@@ -136,7 +136,8 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         };
         $scope.certification = {
             right:  false,
-            licence: false
+            licence: false,
+            text:"odbl"
         };
         $scope.validationAlert = {
             visibility:0,
@@ -219,6 +220,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         $scope.validate = function(){
 
             var results = {
+                data : {},
                 msg : "",
                 status : "error"
             };
@@ -229,6 +231,11 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                 results.msg = "Il manque des champs requis ( onglet Métadonnees ).";
                 return results;
             }
+            results.data.nom = form.name.value;
+            results.data.description = form.desc.value;
+            results.data.source = form.attributions.value
+
+            results.data.categories = self.$$childTail.cat.hash.join(",");
 
             // Location
             if(self.$$childTail.uMetadata.geocoded == 0){
@@ -242,6 +249,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                 results.msg ="Vous devez accepter la licence de publication et certifier avoir le droit de publier les données.";
                 return results;
             }
+            results.data.license = cert.text;
 
             results.status = "ok";
             return results;
@@ -265,30 +273,31 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             return $scope.check;
         };
 
-
         $scope.publish = function(){
             console.log("Publish in Stepper Scope!!");
 
             var validation = $scope.validate();
             if(validation.status != "ok"){
-                console.log(validation.msg);
                 $scope.validationAlert.msg = validation.msg;
                 $scope.validationAlert.visibility = 1;
                 return false;
             }
 
+            var metadata = validation.data;
+            metadata.URI = self.$$childTail.uMetadata.fileUri;
+            metadata.etiquette = self.$$childTail.uMetadata.form.label.value;
+            metadata.c_categorie = self.$$childTail.uMetadata.form.field_category.value;
+
             $http.post("./publish",{
-                data: self.$$childTail.uData,
-                headers: self.$$childTail.uHeaders,
-                metadata: self.$$childTail.uMetadata,
-                location: self.$$childTail.uLocation,
-                form: self.$$childTail.uForm
+                geojson: self.$$childTail.uData,
+                metadata: metadata,
+                properties: self.$$childTail.uMetadata.properties
             }).
             success(function(data, status) {
                     console.log(status);
                     console.log(data);
-                $scope.status = status;
-                $scope.data = data;
+                    $scope.status = status;
+                    $scope.data = data;
             }).
                 error(function(data, status) {
                     console.log(status);

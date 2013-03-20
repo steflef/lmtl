@@ -189,6 +189,7 @@
                 <div class="hero-unit" style="padding:10px 20px;">
                     <h4>Métadonnées</h4>
                     <p>Données sur votre jeu de données. Le nom et la description seront utilisés pour la recherche des données.</p>
+                    <div class="control-group"><button class="btn" ng-click="viewScope()">View Scope</button></div>
                 </div>
                 <h4 class="hide">Métadonnées du jeu de données</h4>
                 <form name="metaForm" class="form-horizontal">
@@ -265,7 +266,7 @@
                         <label class="control-label" for="input{{item.title}}">{{item.title}}</label>
                         <div class="controls">
                             <input class="input-mini" disabled="disabled" type="text" id="input{{item.title}}" placeholder="{{item.type}}" value="{{item.type}}">
-                            <input class="input-xlarge" type="text" placeholder="Description ..." value="{{item.desc}}">
+                            <input ng-model="item.desc" class="input-xlarge" type="text" placeholder="Description ..." value="{{item.desc}}">
                         </div>
                     </div>
 
@@ -298,7 +299,6 @@
                     </div>
 
                 </form>
-                <div class="control-group"><button class="btn" ng-click="viewScope()">View Scope</button></div>
             </div>
 
 
@@ -313,7 +313,7 @@
 
             <h4>Licence</h4>
             <h5>ODbl</h5>
-            <textarea style="width: 60%;height: 240px" name="" id="" cols="30" rows="10"><? require 'licence_odbl.php' ?></textarea>
+            <textarea style="width: 60%;height: 240px" cols="30" rows="10"><? require 'licence_odbl.php' ?></textarea>
             <form>
                 <fieldset>
                     <legend>Consentement</legend>
