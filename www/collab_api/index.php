@@ -401,12 +401,13 @@ $app->get("/admin/users", $authenticate($app), function () use ($app, $di) {
 // ### Publish Dataset Endpoint (POST)[**A**]
 // ### *JSON*
 // Validate & publish datasets
-# $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
-$app->post("/publish",  function () use ($app, $di) {
+$app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
+//$app->post("/publish",  function () use ($app, $di) {
 
     # Slim Request Object
     $reqBody = json_decode( $app->request()->getBody() );
     $meta = $reqBody->metadata;
+    $meta->created_by = $app->view()->getData('user');
     $data = $reqBody->geojson;
     $properties = $reqBody->properties;
 /*
@@ -438,10 +439,13 @@ $app->post("/publish",  function () use ($app, $di) {
     // ##### >> Get Access Token From Spreadsheet API
     $SpreadsheetAPI = new \CQAtlas\Helpers\SpreadsheetApi();
     $SpreadsheetAPI->authenticate($di['google_user'], $di['google_password']);
-    $SpreadsheetAPI->appScript('AKfycbzbFJq0hvgkQt6EYWJvgxS0hcnMNxbXGnee1crmCk0pxFhY2OKn',$driveFile->getId());
+    $resp = $SpreadsheetAPI->appScript('AKfycbzbFJq0hvgkQt6EYWJvgxS0hcnMNxbXGnee1crmCk0pxFhY2OKn',$driveFile->getId());
     // #### Publish JSON Response
     $Response = new \CQAtlas\Helpers\Response($app->response());
-    $Response->show();
+
+    $output = array_merge($Response->toArray(),array('google'=>$resp));
+    echo $jsonOutput = json_encode($output);
+   //$Response->show();
 });
 // ***
 
@@ -449,11 +453,12 @@ $app->post("/publish",  function () use ($app, $di) {
 // ### Publish Dataset Endpoint (POST)[**A**]
 // ### *JSON*
 // Validate & publish datasets
-# $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
-$app->get("/distribute", $apiAuthenticate($app), function () use ($app, $di) {
+# $app->post("/distribute", $apiAuthenticate($app), function () use ($app, $di) {
+$app->get("/distribute", function () use ($app, $di) {
 
     // #### Google Drive Operation Via Server-Side Web App (AppScript::CQ-Check)
     // ##### >> Get Access Token From Spreadsheet API
+    require_once 'vendor/cqatlas/cqatlas/CqUtil.php';
 /*    $SpreadsheetAPI = new \CQAtlas\Helpers\SpreadsheetApi();
     $SpreadsheetAPI->authenticate($di['google_user'], $di['google_password']);
     $scriptOutput = $SpreadsheetAPI->appScript('AKfycbwqmysJ6SdLNoq1_NZ_njnjC9hWMcRkVU9lYN1Di2U5ZbdE2VYZ');
@@ -467,73 +472,167 @@ $app->get("/distribute", $apiAuthenticate($app), function () use ($app, $di) {
     $validatedFiles = array();
     $pubPath = $di['storageDir'].'/publications';
     $fileExtension = 'xls';
-    foreach ($appResponse->results->files as $file) {
-        $validatedFiles[$file->name] = $SpreadsheetAPI->getFile($file->id,$pubPath,$fileExtension);
+    foreach ($appResponse->results->files as &$file) {
+        //$validatedFiles[$file->name] = $SpreadsheetAPI->getFile($file->id,$pubPath,$fileExtension);
+        $getResults = $SpreadsheetAPI->getFile($file->id,$pubPath,$fileExtension);
+        $file['status'] = $getResults['status'];
+        $file['path'] = $getResults['file'];
     }*/
+//    echo '<pre><code>';
+//    print_r($appResponse);
+//    print_r($validatedFiles);
+//    echo '</code></pre>';
+//    $app->stop();
+
+    // FAKE
+    $results = array();
+
+    $ressource = new stdClass;
+    $ressource->id = '0ArDvk7BRZ_yjdHl4OUlfUEc0ZWxpRjZyaS14aEFBLVE';
+    $ressource->name  =  '*V*_SUPER_BATCH';
+    $ressource->state ='validated';
+    $ressource->lastUpdated =  '2013-02-28T16:40:41.181Z';
+    $ressource->status= 200;
+    $ressource->path  = '/Applications/MAMP/htdocs/lmtl/www/collab_api/storage/publications/0ArDvk7BRZ_yjdHl4OUlfUEc0ZWxpRjZyaS14aEFBLVE.xlsx';
+
+    //$results[] = $ressource;
+
+    $ressource = new stdClass;
+    $ressource->id = '0ArDvk7BRZ_yjdG9LNjI4TDQxSGpjaWVpWkJCMUxkeWc';
+    $ressource->name  = '*V*_worsthousing-no-lat-loc-sub_1363806463';
+    $ressource->state ='validated';
+    $ressource->lastUpdated =  '2013-02-28T16:40:41.181Z';
+    $ressource->status= 200;
+    $ressource->path  = '/Applications/MAMP/htdocs/lmtl/www/collab_api/storage/publications/0ArDvk7BRZ_yjdG9LNjI4TDQxSGpjaWVpWkJCMUxkeWc.xlsx';
+
+    $results[] = $ressource;
+
 
     //$sourcePath = sprintf('%s.%s', $pubPath, $fileExtension);
-    $sourcePath = '/Applications/MAMP/htdocs/lmtl/www/collab_api/storage/0ArDvk7BRZ_yjdHl4OUlfUEc0ZWxpRjZyaS14aEFBLVE.xlsx';
-    $Excel = new \CQAtlas\Helpers\Excel();
-    $Excel->getSheet($sourcePath);
+    //$sourcePath = '/Applications/MAMP/htdocs/lmtl/www/collab_api/storage/0ArDvk7BRZ_yjdHl4OUlfUEc0ZWxpRjZyaS14aEFBLVE.xlsx';
+    foreach($results as $file){
 
-    $metas = $Excel->getMetas();
-    $metas['google_drive_id'] = '0ArDvk7BRZ_yjdHl4OUlfUEc0ZWxpRjZyaS14aEFBLVE';
-    $metas['collection_id'] = 0;
-    $metas['version'] = 1;
-    $metas['status'] = 1;
+        $Excel = new \CQAtlas\Helpers\Excel();
+        $Excel->getSheet($file->path);
 
-    $metas['created_by'] = $app->view()->getData('user');
-    //$metas['google_drive_id'] = $file->id;
-    $datas = $Excel->getData();
+        $metadatas = $Excel->getMetas();
+        $data = $Excel->getData();
+        $customFields = $Excel->getProperties();
 
-/*    echo '<pre><code>';
-    print_r($metas);
-    print_r($datas);
-    echo '</code></pre>';*/
+        $metas = new stdClass;
+
+        $metas->google_drive_id = $file->id;
+        $metas->collection_id = 0;
+        $metas->version = 1;
+        $metas->status = 1;
+        // todo: real user ID (Uploader)
+        $metas->created_by = $metadatas['created_by'];
+
+        $metas->attributions = $metadatas['source'];
+        $metas->licence = $metadatas['licence'];
+        $metas->description = $metadatas['description'];
+        $metas->name = $metadatas['nom'];
+        $metas->label = $metadatas['etiquette'];
+
+        $categories = explode(',',$metadatas['categories']);
+        $l = count($categories);
+
+        switch($l){
+            case 3:
+                $metas->tertiary_category_id = $categories[2];
+            case 2:
+                $metas->secondary_category_id = $categories[1];
+            case 1:
+                $metas->primary_category_id = $categories[0];
+            break;
+        }
+        $metas->slug = CqUtil::slugify($metadatas['nom']);
+        $metas->file_uri = $metadatas['URI'];
+
+        // User Defined Fields
+        $dataset_extra_fields = [];
+        foreach ($customFields as $field) {
+            //if( substr($key,0,1) !== '_' ){
+                $dataset_extra_fields[] = array(
+                    'field' => $field['Champ'],
+                    'type'  => $field['Type'],
+                    'desc'  => $field['Description']
+                );
+            //}
+        }
+        $metas->dataset_extra_fields = json_encode($dataset_extra_fields);
 
 
+        $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
 
-    $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
-
-    # CartoDB Add to Datasets
-    //if($file->state === 'validated'){
+        # CartoDB Add to Datasets
         try{
-            $dataset = $CartoDB->addDataset($metas,$datas);
+            $datasetId = $CartoDB->createDataset($metas);
         }catch (Exception $e){
             echo "OUPS $e";
         }
-    //}
 
-exit;
-    # CartoDB Add to Places
+/*        echo "<br>Dataset Created!<br>";
+        echo '<pre><code>';
+       // print_r($datasetId);
+       // print_r($customFields);
+       // print_r($metadatas);
+       // print_r($metas);
+       // print_r($data);
+        echo '</code></pre>';*/
 
-    //$Reader = new \CQAtlas\Helpers\ExcelReader($sourcePath,0);
-    //$objPHPExcel = \PHPExcel_IOFactory::load($sourcePath);
-    //$objPHPExcel = \PHPExcel_IOFactory::createReader($sourcePath);
+        // BUILD INSERTS
+        $batchInserts = array();
+        foreach ($data as $place) {
+            $attributes = new stdClass;
+            $attributes->the_geom = "ST_GeomFromText('POINT(".str_replace(',', ' ',$place['_lonlat']).")',4326)";
+            $attributes->address = $place['_formatted_address'];
+            $attributes->city = $place['_city'];
+            $attributes->postal_code = $place['_postal_code'];
+            $attributes->created_by = $metas->created_by;
+            $attributes->dataset_id = $datasetId;
+            $attributes->label = $place[$metas->label];
+            $attributes->latitude = $place['_lat'];
+            $attributes->longitude = $place['_lon'];
+            $attributes->latitude = $place['_lat'];
 
-    # Slim Request Object
-/*    $reqBody = json_decode( $app->request()->getBody(), true );
-    $meta = $reqBody['metadata'];
-    $data = $reqBody['data'];
-    $headers = $reqBody['headers'];*/
+            $attributes->name_fr = (array_key_exists('nom',$place))?$place['nom']:'';
+           // $attributes->desc = (array_key_exists('description',$place))?$place['description']:'';
+            $attributes->tel_number = (array_key_exists('telephone',$place))?$place['telephone']:'';
+            $attributes->website = (array_key_exists('web',$place))?$place['web']:'';
 
-    // ####Create an Excel Document (2007/.xlsx)
-    # $Excel = new \CQAtlas\Helpers\Excel($meta['name'],$meta['description']);
+            if($metadatas['c_categorie'] === ''){
+                $attributes->primary_category_id = $place[$metadatas['c_categorie']];
+            }else{
+                $attributes->primary_category_id =$metas->primary_category_id;
+                $attributes->secondary_category_id =$metas->secondary_category_id;
+            }
 
-/*    $Excel->setMetas($meta)
-        ->setDataHeaders($headers)
-        ->setData($data)
-        ->save($di['uploadDir'], '05featuredemo');*/
+            //tags
+            $tags = array();
+            foreach ($customFields as $field) {
+                $tags [] = array(
+                    $field['Champ'] => $place[$field['Champ']]
+                );
+            }
+            $attributes->tags = json_encode($tags);
+            $batchInserts[] = $attributes;
+        }
 
-    // ####Upload to Google Drive
-    # $GoogleDrive = new \CQAtlas\Helpers\GoogleDrive();
-    # $driveFile = $GoogleDrive->upload($di['uploadDir'], '05featuredemo');
+        # CartoDB Add to Datasets
+        try{
+            $response = $CartoDB->addPlaces($batchInserts);
+        }catch (Exception $e){
+            echo "AddPlaces :: $e";
+        }
+        echo '<pre><code>';
+        print_r($response);
+        echo '</code></pre>';
+    }
 
 
+    $app->stop();
 
-    // ####Publish JSON Response
-    # $Response = new \CQAtlas\Helpers\Response($app->response());
-    # $Response->show();
 });
 // ***
 

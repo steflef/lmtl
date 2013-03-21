@@ -58,18 +58,16 @@ CREATE TABLE datasets
 
   -- Dataset Meta
   attributions text NOT NULL, -- source
-  bbox_4326 geography(POLYGON,4326), -- POLYGON
+  -- bbox_4326 geography(POLYGON,4326), -- POLYGON
   collection_id integer NOT NULL,
   created_by integer NOT NULL, -- user_id
   dataset_id serial NOT NULL, -- maybe dataset_id varchar (255) NOT NULL,
   dataset_extra_fields TEXT, -- places/tags JSON
-  desc_en text NOT NULL,
-  desc_fr text NOT NULL,
+  desc text NOT NULL,
   google_drive_id varchar(255),
   label varchar(255) NOT NULL,
   licence TEXT NOT NULL,
-  name_en varchar(255) NOT NULL,
-  name_fr varchar(255) NOT NULL,
+  name varchar(255) NOT NULL,
   privacy smallint,
   slug varchar(255) NOT NULL
   status smallint,
@@ -84,15 +82,40 @@ CREATE TABLE datasets
   downloaded_count integer DEFAULT 0,
 
   -- Localy Saved File infos
-  file_format varchar(64) NOT NULL,
-  file_hash varchar (255) NOT NULL,
-  file_mime varchar(64) NOT NULL,
-  file_size varchar(255) NOT NULL,
+  file_format varchar(64),
+  file_hash varchar (255),
+  file_mime varchar(64),
+  file_size varchar(255),
   file_uri varchar(255) NOT NULL,
 
   CONSTRAINT datasets_pkey PRIMARY KEY ( _cartodb_id )
 );
 
+
+ALTER TABLE datasets
+ADD COLUMN attributions text NOT NULL,
+ADD COLUMN collection_id integer NOT NULL,
+ADD COLUMN created_by integer NOT NULL,
+ADD COLUMN dataset_id serial NOT NULL,
+ADD COLUMN dataset_extra_fields TEXT,
+-- ADD COLUMN description text NOT NULL,
+ADD COLUMN google_drive_id varchar(255),
+ADD COLUMN label varchar(255) NOT NULL,
+ADD COLUMN licence TEXT NOT NULL,
+-- ADD COLUMN name varchar(255) NOT NULL,
+ADD COLUMN privacy smallint,
+ADD COLUMN slug varchar(255) NOT NULL,
+ADD COLUMN status smallint,
+ADD COLUMN version smallint,
+ADD COLUMN primary_category_id integer,
+ADD COLUMN secondary_category_id integer,
+ADD COLUMN tertiary_category_id integer,
+ADD COLUMN downloaded_count integer DEFAULT 0,
+--ADD COLUMN file_format varchar(64),
+--ADD COLUMN file_hash varchar (255),
+--ADD COLUMN file_mime varchar(64),
+--ADD COLUMN file_size varchar(255),
+ADD COLUMN file_uri varchar(255) NOT NULL;
 -- Table: categories
 
 -- DROP TABLE categories;

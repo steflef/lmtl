@@ -249,7 +249,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                 results.msg ="Vous devez accepter la licence de publication et certifier avoir le droit de publier les données.";
                 return results;
             }
-            results.data.license = cert.text;
+            results.data.licence = cert.text;
 
             results.status = "ok";
             return results;
@@ -276,6 +276,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         $scope.publish = function(){
             console.log("Publish in Stepper Scope!!");
 
+
             var validation = $scope.validate();
             if(validation.status != "ok"){
                 $scope.validationAlert.msg = validation.msg;
@@ -288,6 +289,9 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             metadata.etiquette = self.$$childTail.uMetadata.form.label.value;
             metadata.c_categorie = self.$$childTail.uMetadata.form.field_category.value;
 
+            $rootScope.$broadcast("load");
+            $scope.safeApply();
+
             $http.post("./publish",{
                 geojson: self.$$childTail.uData,
                 metadata: metadata,
@@ -298,12 +302,14 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                     console.log(data);
                     $scope.status = status;
                     $scope.data = data;
+                    $rootScope.$broadcast("loadEnd");
             }).
                 error(function(data, status) {
                     console.log(status);
                     console.log(data);
                     $scope.data = data || "Request failed";
                     $scope.status = status;
+                    $rootScope.$broadcast("loadEnd");
                 });
             return true;
         };
