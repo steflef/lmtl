@@ -421,16 +421,26 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
     $app->stop();*/
 
     // #### Create an Excel Document (2007/.xlsx)
-    $Excel = new \CQAtlas\Helpers\Excel($meta->nom,$meta->description);
+    try{
+        $Excel = new \CQAtlas\Helpers\Excel($meta->nom,$meta->description);
 
-    $Excel->setSheet()
-          ->setMetas($meta)
-          ->setDataHeaders($properties, $data->features)
-          ->setData($data->features, $properties)
-          ->setProperties($properties)
-          ->save($di['uploadDir'], '05featuredemo');
+        $Excel->setSheet()
+              ->setMetas($meta)
+              ->setDataHeaders($properties, $data->features)
+              ->setData($data->features, $properties)
+              ->setProperties($properties)
+              ->save($di['uploadDir'], '05featuredemo');
 
+    } catch (\Exception $e) {
 
+        $msg = $e->getMessage() . ' ['.$e->getLine().']';
+        $Response = new \CQAtlas\Helpers\Response($app->response(),400,$msg);
+        $output = $Response->toArray();
+        $output['trace'] = $e->getTrace()[0];
+        echo json_encode($output);
+        //$Response->show();
+        $app->stop();
+    }
     // #### Upload to Google Drive
     $GoogleDrive = new \CQAtlas\Helpers\GoogleDrive();
     $driveFile = $GoogleDrive->upload($di['uploadDir'], '05featuredemo');
