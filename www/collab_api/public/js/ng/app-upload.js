@@ -10,7 +10,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 //    })
 
     .directive('toolbar', function () {
-        var linker = function(scope, element, attrs) {
+        var linker = function(scope) {
             scope.$broadcast('newMenu', {id:'upload'});
         };
 
@@ -47,7 +47,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 
     .directive('chosenRao', function () {
         var linker = function(scope, element) {
-            scope.$watch('cat.options', function(item){
+            scope.$watch('cat.options', function(){
                 //console.log("Options Watcher");
                 if(scope.cat.hash.lenght !== 0 ){
                     var codesList = _.pluck(scope.cat.options, 'id');
@@ -204,13 +204,16 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             $rootScope.$broadcast("toStep",{step:step});
         };
 
+        $scope.getStep = function(){
+            return $scope.step;
+        };
+
         $scope.changed = function(){
             $rootScope.$broadcast("newStep", {step:self.step});
         };
 
         $scope.setCheckStatus = function(item, status){
-            var state = status || false;
-            $scope.check[item] = state;
+            $scope.check[item] = status || false;
         };
 
         $scope.getCheckStatus = function(item){
@@ -593,8 +596,8 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         });
 
         $scope.$on('setMarkers', function ($scope, Places) {
-            console.log("==== setMarkers ====");
-            console.log(Places);
+            //console.log("==== setMarkers ====");
+            //console.log(Places);
 
             if (self.map.hasLayer(self.markers)) {
                 self.map.removeLayer(self.markers);
@@ -644,7 +647,11 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             }
 
             self.t_bounds = t_bounds;
-            setTimeout(self.bounds(),800);
+            //console.log(self.$parent);
+            if( self.$parent.getStep() == 3){
+                setTimeout(self.bounds(),800);
+            }
+
         });
 
         $scope.bounds = function(){
@@ -676,7 +683,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                         var postal_code ="";
                         var city = "";
 
-                        _.each(address_components, function(item, index){
+                        _.each(address_components, function(item){
 
                             if( item.types[0] === "postal_code"){
                                 postal_code = item.long_name;
@@ -799,7 +806,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         };
 
         $scope.viewScope = function(){
-            var self = $scope;
+            //var self = $scope;
             console.log($scope);
             //console.log(self.uLocation);
         };
