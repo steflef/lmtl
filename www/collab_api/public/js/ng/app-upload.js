@@ -555,6 +555,23 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 
                 self.geocoder = new google.maps.Geocoder();
             }else{
+                var lonField = self.uMetadata.lonField;
+                var latField = self.uMetadata.latField;
+                _.each(self.uData.features, function(item){
+                    var location = {
+                        "lon":item.properties[lonField],
+                        "lat":item.properties[latField],
+                        "location_type" : "",
+                        "formatted_address" : (item.properties.address || item.properties["adresse"] || item.properties["Adresse"] || ""),
+                        "postal_code" : (item.properties.postal_code || item.properties["code_postal"] || item.properties["C.P."] || ""),
+                        "city" : (item.properties.city || item.properties["ville"] || item.properties["Ville"] || ""),
+                        "service" : ""
+                    };
+
+                    item.geometry.coordinates = [location.lon,location.lat];
+                    item._geo = location;
+
+                });
 
                 $rootScope.$broadcast("setMarkers", self.uData.features);
             }
