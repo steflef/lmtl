@@ -466,10 +466,11 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
 # $app->post("/distribute", $apiAuthenticate($app), function () use ($app, $di) {
 $app->get("/distribute", function () use ($app, $di) {
 
+    ini_set('memory_limit', '256M');
     // #### Google Drive Operation Via Server-Side Web App (AppScript::CQ-Check)
     // ##### >> Get Access Token From Spreadsheet API
     require_once 'vendor/cqatlas/cqatlas/CqUtil.php';
-/*    $SpreadsheetAPI = new \CQAtlas\Helpers\SpreadsheetApi();
+    $SpreadsheetAPI = new \CQAtlas\Helpers\SpreadsheetApi();
     $SpreadsheetAPI->authenticate($di['google_user'], $di['google_password']);
     $scriptOutput = $SpreadsheetAPI->appScript('AKfycbwqmysJ6SdLNoq1_NZ_njnjC9hWMcRkVU9lYN1Di2U5ZbdE2VYZ');
 
@@ -482,17 +483,20 @@ $app->get("/distribute", function () use ($app, $di) {
     $validatedFiles = array();
     $pubPath = $di['storageDir'].'/publications';
     $fileExtension = 'xls';
-    foreach ($appResponse->results->files as &$file) {
+    $results = array();
+/*    foreach ($appResponse->results->files as &$file) {
         //$validatedFiles[$file->name] = $SpreadsheetAPI->getFile($file->id,$pubPath,$fileExtension);
         $getResults = $SpreadsheetAPI->getFile($file->id,$pubPath,$fileExtension);
-        $file['status'] = $getResults['status'];
-        $file['path'] = $getResults['file'];
+        $file->status = $getResults['status'];
+        $file->path = $getResults['file'];
+        $results[] = $file;
     }*/
-//    echo '<pre><code>';
-//    print_r($appResponse);
-//    print_r($validatedFiles);
-//    echo '</code></pre>';
-//    $app->stop();
+/*    echo '<pre><code>';
+    //print_r($appResponse);
+    //print_r($validatedFiles);
+    print_r($results);
+    echo '</code></pre>';
+    $app->stop();*/
 
     // FAKE
     $results = array();
@@ -508,12 +512,12 @@ $app->get("/distribute", function () use ($app, $di) {
     //$results[] = $ressource;
 
     $ressource = new stdClass;
-    $ressource->id = '0ArDvk7BRZ_yjdG9LNjI4TDQxSGpjaWVpWkJCMUxkeWc';
-    $ressource->name  = '*V*_worsthousing-no-lat-loc-sub_1363806463';
+    $ressource->id = '0ArDvk7BRZ_yjdGdOVDlFYUJoU0FjR0hpTlJjUFZRaFE';
+    $ressource->name  = 'omhm-test-1_1364237095';
     $ressource->state ='validated';
     $ressource->lastUpdated =  '2013-02-28T16:40:41.181Z';
     $ressource->status= 200;
-    $ressource->path  = '/Applications/MAMP/htdocs/lmtl/www/collab_api/storage/publications/0ArDvk7BRZ_yjdG9LNjI4TDQxSGpjaWVpWkJCMUxkeWc.xlsx';
+    $ressource->path  = '/Applications/MAMP/htdocs/lmtl/www/collab_api/storage/publications/0ArDvk7BRZ_yjdGdOVDlFYUJoU0FjR0hpTlJjUFZRaFE.xlsx';
 
     $results[] = $ressource;
 
@@ -548,7 +552,7 @@ $app->get("/distribute", function () use ($app, $di) {
         $l = count($categories);
 
         switch($l){
-            case 3:
+            case ($l >= 3):
                 $metas->tertiary_category_id = $categories[2];
             case 2:
                 $metas->secondary_category_id = $categories[1];
@@ -597,8 +601,8 @@ $app->get("/distribute", function () use ($app, $di) {
             $attributes = new stdClass;
             $attributes->the_geom = "ST_GeomFromText('POINT(".str_replace(',', ' ',$place['_lonlat']).")',4326)";
             $attributes->address = $place['_formatted_address'];
-            $attributes->city = $place['_city'];
-            $attributes->postal_code = $place['_postal_code'];
+            $attributes->city = trim($place['_city']);
+            $attributes->postal_code = trim($place['_postal_code']);
             $attributes->created_by = $metas->created_by;
             $attributes->dataset_id = $datasetId;
             $attributes->label = $place[$metas->label];
@@ -611,11 +615,16 @@ $app->get("/distribute", function () use ($app, $di) {
             $attributes->tel_number = (array_key_exists('telephone',$place))?$place['telephone']:'';
             $attributes->website = (array_key_exists('web',$place))?$place['web']:'';
 
+            echo '<pre><code>';
+            print_r($metadatas);
+            print_r($metas);
+            echo '</code></pre>';
+
             if($metadatas['c_categorie'] === ''){
                 $attributes->primary_category_id = $place[$metadatas['c_categorie']];
             }else{
-                $attributes->primary_category_id =$metas->primary_category_id;
-                $attributes->secondary_category_id =$metas->secondary_category_id;
+                $attributes->primary_category_id = $metas->primary_category_id;
+                $attributes->secondary_category_id = $metas->secondary_category_id;
             }
 
             //tags
@@ -626,6 +635,14 @@ $app->get("/distribute", function () use ($app, $di) {
                 );
             }
             $attributes->tags = json_encode($tags);
+
+            foreach ($attributes as $key=>&$val) {
+                if($val === ''){
+                    $val = 'NULL';
+                }
+            }
+
+
             $batchInserts[] = $attributes;
         }
 
