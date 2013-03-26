@@ -288,7 +288,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             }
 
             var metadata = validation.data;
-            metadata.URI = self.$$childTail.uMetadata.fileUri;
+            metadata.uri = self.$$childTail.uMetadata.fileUri;
             metadata.etiquette = self.$$childTail.uMetadata.form.label.value;
             metadata.c_categorie = self.$$childTail.uMetadata.form.field_category.value;
 
