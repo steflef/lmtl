@@ -12,7 +12,7 @@
 use \Slim\Slim;
 use Slim\Middleware\SessionCookie;
 use \Aura\Sql\ConnectionFactory;
-use \Pimple;
+//use \Pimple;
 //use \Bcrypt; # todo
 //use Guzzle\Http\Client; # todo
 
@@ -403,6 +403,8 @@ $app->get("/admin/users", $authenticate($app), function () use ($app, $di) {
 // Validate & publish datasets
 $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
 //$app->post("/publish",  function () use ($app, $di) {
+    ini_set('memory_limit', '256M');
+    require_once 'vendor/cqatlas/cqatlas/CqUtil.php';
 
     # Slim Request Object
     $reqBody = json_decode( $app->request()->getBody() );
@@ -410,8 +412,8 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
     $meta->created_by = $app->view()->getData('user');
     $data = $reqBody->geojson;
     $properties = $reqBody->properties;
-/*
-    echo '<pre><code>';
+
+/*    echo '<pre><code>';
     print_r($meta);
     print_r($data);
     print_r($properties);
@@ -429,7 +431,7 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
               ->setDataHeaders($properties, $data->features)
               ->setData($data->features, $properties)
               ->setProperties($properties)
-              ->save($di['uploadDir'], '05featuredemo');
+              ->save($di['pubDir'], $meta->nom);
 
     } catch (\Exception $e) {
 
@@ -441,8 +443,133 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
         //$Response->show();
         $app->stop();
     }
+    // #### Upload to CartoDB
+
+    $dataset = new stdClass;
+
+    $dataset->google_drive_id = '';
+    $dataset->collection_id = 0;
+    $dataset->version = 1;
+    $dataset->privacy = 1;
+    $dataset->status = 0;
+    // todo: real user ID (Uploader)
+    $dataset->created_by = $meta->created_by;
+
+    $dataset->attributions = $meta->source;
+    $dataset->licence = $meta->licence;
+    $dataset->description = $meta->description;
+    $dataset->name = $meta->nom;
+    $dataset->label = $meta->etiquette;
+
+    $categories = explode(',',$meta->categories);
+    $l = count($categories);
+
+    switch($l){
+        case ($l >= 3):
+            $dataset->tertiary_category_id = $categories[2];
+        case 2:
+            $dataset->secondary_category_id = $categories[1];
+        case 1:
+            $dataset->primary_category_id = $categories[0];
+            break;
+    }
+    $dataset->slug = CqUtil::slugify($dataset->name);
+    $dataset->file_uri = $meta->uri;
+
+    // User Defined Fields
+    $dataset_extra_fields = [];
+    foreach ($properties as $field) {
+        $dataset_extra_fields[] = array(
+            'field' => $field->title,
+            'type'  => $field->type,
+            'desc'  => $field->desc
+        );
+    }
+    $dataset->dataset_extra_fields = json_encode($dataset_extra_fields);
+
+
+    $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
+
+    # CartoDB Add to Datasets
+    try{
+        $datasetId = $CartoDB->createDataset($dataset);
+    }catch (Exception $e){
+        $msg = $e->getMessage() . ' ['.$e->getLine().']';
+        $Response = new \CQAtlas\Helpers\Response($app->response(),400,$msg);
+        $output = $Response->toArray();
+        $output['trace'] = $e->getTrace()[0];
+        echo json_encode($output);
+        //$Response->show();
+        $app->stop();
+    }
+
+    // BUILD INSERTS
+    $batchInserts = array();
+    foreach ($data->features as $place) {
+        $attributes = new stdClass;
+        $attributes->the_geom = "ST_GeomFromText('POINT(".str_replace(',', ' ',$place->_geo->lon.' '.$place->_geo->lat).")',4326)";
+        $attributes->address = $place->_geo->formatted_address;
+        $attributes->city = trim($place->_geo->city);
+        $attributes->postal_code = trim($place->_geo->postal_code);
+        $attributes->created_by = $dataset->created_by;
+        $attributes->dataset_id = $datasetId;
+        $attributes->label = $place->properties->{$dataset->label};
+        $attributes->latitude = $place->_geo->lat;
+        $attributes->longitude = $place->_geo->lon;
+
+        $attributes->name_fr = (array_key_exists('nom',$place->properties))?$place->properties->nom:'';
+        // $attributes->desc = (array_key_exists('description',$place))?$place['description']:'';
+        $attributes->tel_number = (array_key_exists('telephone',$place->properties))?$place->properties->telephone:'';
+        $attributes->website = (array_key_exists('web',$place->properties))?$place->properties->web:'';
+
+/*        echo '<pre><code>';
+        print_r($metadatas);
+        print_r($metas);
+        echo '</code></pre>';*/
+
+        if($meta->c_categorie !== ''){
+            $attributes->primary_category_id = $place->properties->{$meta->c_categorie};
+        }else{
+            $attributes->primary_category_id = $dataset->primary_category_id;
+            $attributes->secondary_category_id = $dataset->secondary_category_id;
+        }
+
+        //tags
+        $tags = array();
+        foreach ($properties as $field) {
+            $tags [] = array(
+                $field->title => $place->properties->{$field->title}
+            );
+        }
+        $attributes->tags = json_encode($tags);
+
+        foreach ($attributes as $key=>&$val) {
+            if($val === ''){
+                $val = 'NULL';
+            }
+        }
+
+        $batchInserts[] = $attributes;
+    }
+
+    # CartoDB Add to Datasets
+    try{
+        $response = $CartoDB->addPlaces($batchInserts);
+    }catch (Exception $e){
+        $msg = $e->getMessage() . ' ['.$e->getLine().']';
+        $Response = new \CQAtlas\Helpers\Response($app->response(),400,$msg);
+        $output = $Response->toArray();
+        $output['trace'] = $e->getTrace()[0];
+        echo json_encode($output);
+        //$Response->show();
+        $app->stop();
+    }
+    echo '<pre><code>';
+    print_r($response);
+    echo '</code></pre>';
+
     // #### Upload to Google Drive
-    $GoogleDrive = new \CQAtlas\Helpers\GoogleDrive();
+/*    $GoogleDrive = new \CQAtlas\Helpers\GoogleDrive();
     $driveFile = $GoogleDrive->upload($di['uploadDir'], '05featuredemo');
 
     // #### Google Drive Operation Via Server-Side Web App (AppScript::CQ Handler)
@@ -454,7 +581,7 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
     $Response = new \CQAtlas\Helpers\Response($app->response());
 
     $output = array_merge($Response->toArray(),array('google'=>$resp));
-    echo $jsonOutput = json_encode($output);
+    echo $jsonOutput = json_encode($output);*/
    //$Response->show();
 });
 // ***
