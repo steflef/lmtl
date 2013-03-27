@@ -181,10 +181,36 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         });
 
         $scope.$on('load', function () {
-            self.showLoader();
+            var text = arguments[1] || "";
+            self.showLoader(text);
         });
         $scope.$on('loadEnd', function () {
             self.hideLoader();
+        });
+
+        $scope.$on('newPublication', function () {
+
+            var oMsg = {
+                title: "Publié avec succès!",
+                text: "Redirection vers le Tableau de bord dans 2 sec."
+            };
+            self.showMsg(oMsg);
+
+            setTimeout(function(){
+                    window.location.href = "./";
+                },3000
+            );
+
+        });
+
+        $scope.$on('showMsg', function () {
+            var msg = arguments[1] || {title:"",text:""};
+            self.showMsg(msg);
+
+//            setTimeout(function(){
+//                self.hideMsg();
+//            },2000
+//            );
         });
 
         $scope.$watch('step', function(newValue) {
@@ -277,8 +303,6 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         };
 
         $scope.publish = function(){
-            console.log("Publish in Stepper Scope!!");
-
 
             var validation = $scope.validate();
             if(validation.status != "ok"){
@@ -292,7 +316,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             metadata.etiquette = self.$$childTail.uMetadata.form.label.value;
             metadata.c_categorie = self.$$childTail.uMetadata.form.field_category.value;
 
-            $rootScope.$broadcast("load");
+            $rootScope.$broadcast("load", "Publication");
             $scope.safeApply();
 
             $http.post("./publish",{
@@ -303,25 +327,26 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             success(function(data, status) {
                     console.log(status);
                     console.log(data);
-                    $scope.status = status;
-                    $scope.data = data;
+                    //$scope.status = status;
+                    //$scope.data = data;
                     $rootScope.$broadcast("loadEnd");
             }).
                 error(function(data, status) {
                     console.log(status);
                     console.log(data);
-                    $scope.data = data || "Request failed";
+                    //$scope.data = data || "Request failed";
                     $scope.status = status;
                     $rootScope.$broadcast("loadEnd");
+                    $rootScope.$broadcast("newPublication");
                 });
             return true;
         };
 
-        $scope.showLoader = function(){
+        $scope.showLoader = function(text){
             if($scope.overlay){
-
                 return false;
             }
+
             var opts = {
                 lines: 13, // The number of lines to draw
                 length: 11, // The length of each line
@@ -346,7 +371,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             var spinner = new Spinner(opts).spin(target);
             $scope.backdrop = target;
             $scope.overlay = iosOverlay({
-                text: "Analyse",
+                text: text,
                 duration: null,
                 spinner: spinner
             });
@@ -365,6 +390,55 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             return true;
         };
 
+        $scope.showMsg = function(msg){
+            console.log("showMsg");
+            if($scope.overlayMsg){
+                return false;
+            }
+
+            var target = document.createElement("div");
+            target.id = "overlay";
+            //target.style.cssText = 'background-color:#fff;position:fixed;top:0;bottom:0;width:100%;z-index:2;opacity:.5;';
+
+
+            var uiOverlay = document.createElement("div");
+            uiOverlay.className = "ui-overlay";
+
+            var msgBox = document.createElement("div");
+            msgBox.className = "ui-msgbox";
+
+            var msgTitle = document.createElement("div");
+            msgTitle.className = "title lead";
+            var newContent = document.createTextNode(msg.title);
+
+            var p = document.createElement("p");
+            var pContent = document.createTextNode(msg.text);
+            p.appendChild(pContent);
+
+            msgTitle.appendChild(newContent);
+            msgTitle.appendChild(p);
+
+            msgBox.appendChild(msgTitle);
+
+            target.appendChild(msgBox);
+            target.appendChild(uiOverlay);
+            document.body.appendChild(target);
+
+            $scope.overlayMsg = target;
+        };
+
+        $scope.hideMsg = function(){
+            console.log("HIDE!");
+            if(!$scope.overlayMsg){
+                return false;
+            }
+            //$scope.overlayMsg.hide();
+            var handle = $scope.overlayMsg;
+            handle.parentNode.removeChild(handle);
+            $scope.overlayMsg = null;
+            return true;
+        };
+
     })
     .controller('UploadCtrl', function($rootScope, $scope, upload) {
         var self = $scope;
@@ -374,7 +448,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 
         $scope.upload = function() {
             $rootScope.$broadcast("newUpload");
-            $rootScope.$broadcast("load");
+            $rootScope.$broadcast("load","Chargement");
             upload.submit("ng_upload",$scope.uploadResponse);
         };
 
@@ -423,15 +497,6 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             }
 
             return true;
-        };
-
-        $scope.viewScope = function(){
-            console.log($scope);
-            console.log("View PARENT SCOPE");
-            console.log($scope.$parent);
-            console.log($scope.$parent.$$childTail);
-            console.log("View ROOTSCOPE");
-            console.log($rootScope);
         };
     })
     .controller('TabPaneCtrl', function($rootScope, $scope) {
@@ -505,10 +570,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
     .controller('GridCtrl', function($scope,$rootScope, $http) {
         var self = $scope;
         $scope.uData = [];
-        $scope.uLocation = [];
-        $scope.uHeaders = [];
         $scope.uMetadata = [];
-        $scope.uForm = [];
         $scope.dataExtract = [];
         $scope.geoConsole = "Appuyez sur le bouton geocodage pour lancer l'operation.";
         $scope.geoLog = "------------------------------\nConsole de geocodage\n------------------------------";
