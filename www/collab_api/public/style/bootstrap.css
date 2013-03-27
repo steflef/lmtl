@@ -5456,6 +5456,7 @@ h6 {
 }
 .navbar {
   -webkit-transform: translate3d(0, 0, 0px);
+  z-index: 20;
 }
 .navbar .active {
   font-weight: 600;
