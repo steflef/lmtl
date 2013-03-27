@@ -437,10 +437,8 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
 
         $msg = $e->getMessage() . ' ['.$e->getLine().']';
         $Response = new \CQAtlas\Helpers\Response($app->response(),400,$msg);
-        $output = $Response->toArray();
-        $output['trace'] = $e->getTrace()[0];
-        echo json_encode($output);
-        //$Response->show();
+        $Response->addContent(array('trace' => $e->getTrace()[0]));
+        $Response->show();
         $app->stop();
     }
     // #### Upload to CartoDB
@@ -452,14 +450,15 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
     $dataset->version = 1;
     $dataset->privacy = 1;
     $dataset->status = 0;
-    // todo: real user ID (Uploader)
     $dataset->created_by = $meta->created_by;
-
     $dataset->attributions = $meta->source;
     $dataset->licence = $meta->licence;
     $dataset->description = $meta->description;
     $dataset->name = $meta->nom;
     $dataset->label = $meta->etiquette;
+    $dataset->tertiary_category_id = 0;
+    $dataset->secondary_category_id = 0;
+    $dataset->primary_category_id = 0;
 
     $categories = explode(',',$meta->categories);
     $l = count($categories);
@@ -487,7 +486,6 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
     }
     $dataset->dataset_extra_fields = json_encode($dataset_extra_fields);
 
-
     $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
 
     # CartoDB Add to Datasets
@@ -496,14 +494,12 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
     }catch (Exception $e){
         $msg = $e->getMessage() . ' ['.$e->getLine().']';
         $Response = new \CQAtlas\Helpers\Response($app->response(),400,$msg);
-        $output = $Response->toArray();
-        $output['trace'] = $e->getTrace()[0];
-        echo json_encode($output);
-        //$Response->show();
+        $Response->addContent(array('trace' => $e->getTrace()[0]));
+        $Response->show();
         $app->stop();
     }
 
-    // BUILD INSERTS
+    // BUILD PLACES INSERTS
     $batchInserts = array();
     foreach ($data->features as $place) {
         $attributes = new stdClass;
@@ -518,16 +514,11 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
         $attributes->longitude = $place->_geo->lon;
 
         $attributes->name_fr = (array_key_exists('nom',$place->properties))?$place->properties->nom:'';
-        // $attributes->desc = (array_key_exists('description',$place))?$place['description']:'';
+        $attributes->description = (array_key_exists('description',$place->properties))?$place->properties->description:'';
         $attributes->tel_number = (array_key_exists('telephone',$place->properties))?$place->properties->telephone:'';
         $attributes->website = (array_key_exists('web',$place->properties))?$place->properties->web:'';
 
-/*        echo '<pre><code>';
-        print_r($metadatas);
-        print_r($metas);
-        echo '</code></pre>';*/
-
-        if($meta->c_categorie !== ''){
+        if(trim($meta->c_categorie) !== ''){
             $attributes->primary_category_id = $place->properties->{$meta->c_categorie};
         }else{
             $attributes->primary_category_id = $dataset->primary_category_id;
@@ -552,37 +543,20 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
         $batchInserts[] = $attributes;
     }
 
-    # CartoDB Add to Datasets
+    # CartoDB Add to Places
     try{
-        $response = $CartoDB->addPlaces($batchInserts);
+        $placesOutput = $CartoDB->addPlaces($batchInserts);
     }catch (Exception $e){
         $msg = $e->getMessage() . ' ['.$e->getLine().']';
         $Response = new \CQAtlas\Helpers\Response($app->response(),400,$msg);
-        $output = $Response->toArray();
-        $output['trace'] = $e->getTrace()[0];
-        echo json_encode($output);
-        //$Response->show();
+        $Response->addContent(array('trace' => $e->getTrace()[0]));
+        $Response->show();
         $app->stop();
     }
-    echo '<pre><code>';
-    print_r($response);
-    echo '</code></pre>';
 
-    // #### Upload to Google Drive
-/*    $GoogleDrive = new \CQAtlas\Helpers\GoogleDrive();
-    $driveFile = $GoogleDrive->upload($di['uploadDir'], '05featuredemo');
-
-    // #### Google Drive Operation Via Server-Side Web App (AppScript::CQ Handler)
-    // ##### >> Get Access Token From Spreadsheet API
-    $SpreadsheetAPI = new \CQAtlas\Helpers\SpreadsheetApi();
-    $SpreadsheetAPI->authenticate($di['google_user'], $di['google_password']);
-    $resp = $SpreadsheetAPI->appScript('AKfycbzbFJq0hvgkQt6EYWJvgxS0hcnMNxbXGnee1crmCk0pxFhY2OKn',$driveFile->getId());
-    // #### Publish JSON Response
-    $Response = new \CQAtlas\Helpers\Response($app->response());
-
-    $output = array_merge($Response->toArray(),array('google'=>$resp));
-    echo $jsonOutput = json_encode($output);*/
-   //$Response->show();
+    $Response = new \CQAtlas\Helpers\Response($app->response(),200,'ok');
+    $Response->addContent($placesOutput);
+    $Response->show();
 });
 // ***
 
