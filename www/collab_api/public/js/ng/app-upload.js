@@ -207,10 +207,10 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             var msg = arguments[1] || {title:"",text:""};
             self.showMsg(msg);
 
-//            setTimeout(function(){
-//                self.hideMsg();
-//            },2000
-//            );
+            setTimeout(function(){
+                self.hideMsg();
+            },5000
+            );
         });
 
         $scope.$watch('step', function(newValue) {
@@ -330,6 +330,7 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                     //$scope.status = status;
                     //$scope.data = data;
                     $rootScope.$broadcast("loadEnd");
+                    $rootScope.$broadcast("newPublication");
             }).
                 error(function(data, status) {
                     console.log(status);
@@ -337,7 +338,12 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                     //$scope.data = data || "Request failed";
                     $scope.status = status;
                     $rootScope.$broadcast("loadEnd");
-                    $rootScope.$broadcast("newPublication");
+
+                    var oMsg = {
+                        title: "Erreur lors de la publication",
+                        text: "Code: "+status+". Consultez la consolle pour plus d'infos."
+                    };
+                    $rootScope.$broadcast("showMsg", oMsg);
                 });
             return true;
         };
