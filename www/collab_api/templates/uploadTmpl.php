@@ -189,7 +189,7 @@
                 <div class="hero-unit hero-unit-small-margin">
                     <h4>Métadonnées</h4>
                     <p>Données sur votre jeu de données. Le nom et la description seront utilisés pour la recherche des données.</p>
-                    <div class="control-group"><button class="btn" ng-click="viewScope()">View Scope</button></div>
+                    <!--<div class="control-group"><button class="btn" ng-click="viewScope()">View Scope</button></div>-->
                 </div>
                 <h4 class="hide">Métadonnées du jeu de données</h4>
                 <form name="metaForm" class="form-horizontal">
