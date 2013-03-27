@@ -5420,6 +5420,9 @@ h6 {
 .hero-unit-footer li {
   line-height: 30px;
 }
+.hero-unit-small-margin {
+  padding: 10px 20px;
+}
 .test {
   border: 1px solid #f00;
 }
@@ -5454,8 +5457,38 @@ h6 {
   background: #8c8c8c;
   width: 6px;
 }
+#overlay .ui-overlay {
+  background-color: #ffffff;
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  width: 100%;
+  z-index: 2;
+  opacity: 0.5;
+}
+#overlay .ui-msgbox {
+  z-index: 99998;
+  position: fixed;
+  top: 30%;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: rgba(0, 0, 0, 0.8);
+}
+#overlay .ui-msgbox .title {
+  color: #FFF;
+  text-align: center;
+  display: block;
+  position: absolute;
+  top: 30%;
+  left: 0;
+  width: 100%;
+  z-index: 99999;
+  font-family: OpenSansBold, Sans;
+}
 .navbar {
   -webkit-transform: translate3d(0, 0, 0px);
+  z-index: 20;
 }
 .navbar .active {
   font-weight: 600;
