@@ -3,7 +3,7 @@
     <p>&copy; Collectif Quartier 2013</p>
 </footer>-->
 <footer class="footer">
-<p>test</p>
+<p>&nbsp;</p>
 </footer>
 <script language="JavaScript" type="text/javascript">
     evnts = {};
