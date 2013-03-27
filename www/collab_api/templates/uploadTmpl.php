@@ -110,7 +110,7 @@
             <div ng-show="(step == 2)">
                 <div  id="grid" name="grid">
                     <div ng-show="(uData.features.length>0)">
-                        <div class="hero-unit" style="padding:10px 20px;">
+                        <div class="hero-unit hero-unit-small-margin">
                             <h4>Complétez l'activation du jeu de données</h4>
                             <p>Utilisez les onglets pour naviguer et compléter les métadonnées pour ensuite procéder à la publication.</p>
                             <small>Consultez l'onglet publication pour les droits et licences attribuées aux documents.</small>
@@ -149,7 +149,7 @@
 
             <div ng-show="(step == 3)">
                 <div ng-show="(uData.features.length>0)">
-                    <div class="hero-unit" style="padding:10px 20px;">
+                    <div class="hero-unit hero-unit-small-margin">
                         <h4>Géocodage</h4>
                         <p  ng-show="(uMetadata.geocoded==1)">Vos données sont géolocalisées.</p>
                         <p  ng-show="(uMetadata.geocoded==0)">Besoin d'aide pour géolocaliser vos données?</p>
@@ -186,7 +186,7 @@
             </div>
 
             <div ng-show="(step == 4)">
-                <div class="hero-unit" style="padding:10px 20px;">
+                <div class="hero-unit hero-unit-small-margin">
                     <h4>Métadonnées</h4>
                     <p>Données sur votre jeu de données. Le nom et la description seront utilisés pour la recherche des données.</p>
                     <div class="control-group"><button class="btn" ng-click="viewScope()">View Scope</button></div>
@@ -306,7 +306,7 @@
 
         <div ng-show="(step == 5)">
 
-            <div class="hero-unit" style="padding:10px 20px;">
+            <div class="hero-unit hero-unit-small-margin">
                 <h4>Droits & licence</h4>
                 <p>Informations nécessaires sur les licences, l'entreposage de l'information ...</p>
             </div>
@@ -329,7 +329,7 @@
             </form>
         </div>
         <div ng-show="(step == 6)">
-            <div class="hero-unit" style="padding:10px 20px;">
+            <div class="hero-unit hero-unit-small-margin">
                 <h4>Publication</h4>
                 <p>Les données publiées seront validées par Collectif Quartier qui se réserve le droit de non-publication en cas de doute sur l'exactitude des données, sur les droits associées ou sur la nature des données.</p>
             </div>
