@@ -108,7 +108,7 @@ angular.module('appMain', ['ngSanitize'])
         var self = $scope;
         $scope.datasets = [];
         $scope.places = [];
-
+        $scope.place = [];
 
         $scope.init = function(){
             console.log('INIT');
@@ -124,7 +124,12 @@ angular.module('appMain', ['ngSanitize'])
             console.log('EVENT newDatasets');
             console.log(oData);
             self.datasets = oData.results;
-            self.getPlaces( oData.results[0].id );
+            if(self.datasets.length < 1){
+                console.log('No Place in Dataset!');
+            }else{
+                self.getPlaces( oData.results[0].id );
+            }
+
         });
 
         $scope.$on('newPlaces', function ($scope, oData) {
@@ -132,6 +137,14 @@ angular.module('appMain', ['ngSanitize'])
             console.log(oData);
             self.places = oData.results;
             $rootScope.$broadcast("setMarkers", oData.results);
+        });
+
+        $scope.$on('newPlace', function ($scope, oData) {
+            console.log('EVENT newPlace');
+            console.log(oData);
+            self.place = oData.results;
+
+            self.safeApply();
         });
 
         // HTTP GET DATASET
@@ -157,11 +170,11 @@ angular.module('appMain', ['ngSanitize'])
 
         // HTTP GET PLACES
         $scope.getPlaces = function(datasetId){
-            console.log("Get Places!!");
+            console.log("Get Places!! Dataset("+datasetId+")");
             //var self = $scope;
 
             $http.get("./datasets/"+datasetId +"/places").
-                success(function(data, status) {
+                success(function(data) {
                     //console.log(status);
                     //console.log(data);
                     if(data.status == 200){
@@ -176,8 +189,28 @@ angular.module('appMain', ['ngSanitize'])
                 });
         };
 
+        // HTTP GET SINGLE PLACE
+        $scope.getPlace = function(placeId){
+            console.log("Get Places #"+placeId);
+
+            $http.get("./places/"+placeId ).
+                success(function(data) {
+                    //console.log(status);
+                    //console.log(data);
+                    if(data.status == 200){
+                        self.$broadcast('newPlace', data);
+                    }
+                }).
+                error(function(data, status) {
+                    console.log(status);
+                    console.log(data);
+                    //$scope.data = data || "Request failed";
+                    $scope.status = status;
+                });
+        };
+
         // HTTP POST
-        $scope.publish = function(){
+/*        $scope.publish = function(){
             console.log("Publish in Stepper Scope!!");
             //console.log($scope);
             //console.log(self.$$childTail.uData);
@@ -199,8 +232,10 @@ angular.module('appMain', ['ngSanitize'])
                     $scope.data = data || "Request failed";
                     $scope.status = status;
                 });
-        };
+        };*/
 
-
+        $scope.getScope = function(){
+            console.log($scope);
+        }
 
     });
