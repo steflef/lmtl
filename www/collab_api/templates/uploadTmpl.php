@@ -241,12 +241,31 @@
                     </div>
 
                     <div class="control-group"><h4>Catégorisation et affichage des lieux</h4></div>
+
+                    <div class="control-group info">
+                        <label for="" class="control-label">Nom du lieu</label>
+                        <div class="controls">
+                            <select ng-model="uMetadata.fieldName" ng-options='item.title as item.title for item in uMetadata.properties'>
+                            </select>
+                            <span class="help-inline">Attribut utilisé pour le nom des lieux</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group info">
+                        <label for="" class="control-label">Description du lieu</label>
+                        <div class="controls">
+                            <select ng-model="uMetadata.fieldDescription" ng-options='item.title as item.title for item in uMetadata.properties'>
+                            </select>
+                            <span class="help-inline">Attribut utilisé pour la description des lieux</span>
+                        </div>
+                    </div>
+
                     <div class="control-group info">
                         <label for="" class="control-label">Étiquette</label>
                         <div class="controls">
                             <select ng-model="uMetadata.form.label.value" ng-options='item.title as item.title for item in uMetadata.properties'>
                             </select>
-                            <span class="help-inline">Champs utilisé pour les étiquettes cartographiques</span>
+                            <span class="help-inline">Attribut utilisé pour les étiquettes cartographiques</span>
                             <input type="hidden" id="r_label_value" name="r_label_value" value="">
                         </div>
                     </div>
