@@ -496,7 +496,7 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
     print_r($data);
     print_r($properties);
     echo '</code></pre>';
-    $Response = new \CQAtlas\Helpers\Response($app->response());
+    $Response = new \CQAtlas\Helpers\Response($app->response(),400);
     $Response->show();
     $app->stop();*/
 
@@ -595,8 +595,10 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
         $attributes->latitude = $place->_geo->lat;
         $attributes->longitude = $place->_geo->lon;
 
-        $attributes->name_fr = (array_key_exists('nom',$place->properties))?$place->properties->nom:'';
-        $attributes->description = (array_key_exists('description',$place->properties))?$place->properties->description:'';
+        //$attributes->name_fr = (array_key_exists('nom',$place->properties))?$place->properties->nom:'';
+        $attributes->name_fr = $place->properties->{$meta->att_name};
+        // (array_key_exists('description',$place->properties))?$place->properties->description:'';
+        $attributes->description = $place->properties->{$meta->att_description};
         $attributes->tel_number = (array_key_exists('telephone',$place->properties))?$place->properties->telephone:'';
         $attributes->website = (array_key_exists('web',$place->properties))?$place->properties->web:'';
 
