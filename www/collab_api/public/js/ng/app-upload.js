@@ -314,6 +314,8 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             var metadata = validation.data;
             metadata.uri = self.$$childTail.uMetadata.fileUri;
             metadata.etiquette = self.$$childTail.uMetadata.form.label.value;
+            metadata.att_name = self.$$childTail.uMetadata.fieldName;
+            metadata.att_description = self.$$childTail.uMetadata.fieldDescription;
             metadata.c_categorie = self.$$childTail.uMetadata.form.field_category.value;
 
             $rootScope.$broadcast("load", "Publication");
@@ -612,7 +614,10 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
             self.uData = oData.geojson;
             self.uMetadata = oData.metadata;
             // Champ Label Promise >> blank otherwise
-            self.uMetadata.form.label.value = self.uMetadata.properties[0].title;
+            var firstPropertieTitle = self.uMetadata.properties[0].title;
+            self.uMetadata.form.label.value = firstPropertieTitle;
+            self.uMetadata.fieldName = firstPropertieTitle;
+            self.uMetadata.fieldDescription = firstPropertieTitle;
 
             //Extract
             for(var i=0;i<3;i++){
