@@ -159,11 +159,41 @@ $app->get("/datasets/:id", $apiCache($app, $di), function ($datasetId) use ($app
 // ### API -  */datasets/:id/places*
 // ### Get a List of places for a Dataset  (GET)
 // #### *JSON* - *STATIC CACHE*
-$app->get("/datasets/:id/places", $apiCache($app, $di), function ($datasetId) use ($app, $di) {
+/*$app->get("/datasets/:id/places", $apiCache($app, $di), function ($datasetId) use ($app, $di) {
 
     $from = 'places';
     $query =  'WHERE dataset_id='.(Integer)$datasetId;
     processRequest( $app, $di, $from, $query );
+});*/
+// ***
+
+// ### API -  */datasets/:id/places*
+// ### Get a List of places for a Dataset  (GET)
+// #### *JSON* - *STATIC CACHE*
+$app->get("/datasets/:id/places", $apiCache($app, $di), function ($datasetId) use ($app, $di) {
+
+    $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
+
+    try{
+        $places = $CartoDB->getPlaces($datasetId);
+
+    }catch (\Exception $e){
+        $Response = new \CQAtlas\Helpers\Response($app->response(),400,$e->getMessage());
+        $Response->addContent(array('trace' => $e->getTrace()[0]));
+        $Response->show();
+        $app->stop();
+    }
+
+    $Response = new \CQAtlas\Helpers\Response($app->response());
+    $Response->addContent(array('timestamp'=>time(),'results'=>$places));
+    $output = $Response->toArray();
+    $jsonOutput = json_encode($output);
+
+    // #### Cache the Response
+    $Cache = new \CQAtlas\Helpers\Cache($app, $di);
+    $Cache->save($jsonOutput);
+
+    $Response->show();
 });
 // ***
 
@@ -213,9 +243,26 @@ $app->put("/datasets/:datasetId/places", function ($datasetId) use ($app, $di) {
 //$app->get("/places/:id", $apiCache($app, $di), function ($placeId) use ($app, $di) {
 $app->get("/places/:id", $apiCache($app, $di), function ($placeId) use ($app, $di) {
 
-    $from = 'places';
-    $query =  'WHERE place_id=' .(Integer)$placeId. ' LIMIT 1';
-    processRequest( $app, $di, $from, $query );
+    $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
+
+    try{
+        $placeDetails = $CartoDB->getPlace($placeId);
+
+    }catch (\Exception $e){
+        $Response = new \CQAtlas\Helpers\Response($app->response(),400,$e->getMessage());
+        $Response->show();
+        $app->stop();
+    }
+
+    $Response = new \CQAtlas\Helpers\Response($app->response());
+    $Response->addContent(array('timestamp'=>time(),'results'=>$placeDetails[0]));
+    $jsonOutput = json_encode($Response->toArray());
+
+    // #### Cache the Response
+    $Cache = new \CQAtlas\Helpers\Cache($app, $di);
+    $Cache->save($jsonOutput);
+
+    $Response->show();
 });
 // ***
 
@@ -251,6 +298,35 @@ $app->get("/places/:id/near", $apiCache($app, $di), function ($placeId) use ($ap
 });
 // ***
 
+// ### API -  */places/:id/near*
+// ### Get Places Near a Place (GET)
+// #### *Print JSON* - *STATIC CACHE*
+$app->get("/test/:id", $apiCache($app, $di), function ($datasetId) use ($app, $di) {
+
+    $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
+
+    try{
+        $placesCount = $CartoDB->getPlacesCount($datasetId);
+
+    }catch (\Exception $e){
+        $Response = new \CQAtlas\Helpers\Response($app->response(),400,$e->getMessage());
+        $Response->addContent(array('trace' => $e->getTrace()[0]));
+        $Response->show();
+        $app->stop();
+    }
+    echo $placesCount;
+/*    $Response = new \CQAtlas\Helpers\Response($app->response());
+    $output = array_merge($Response->toArray(),array('timestamp'=>time(),'results'=>$placesNearby));
+    $jsonOutput = json_encode($output);
+
+    // #### Cache the Response
+    $Cache = new \CQAtlas\Helpers\Cache($app, $di);
+    $Cache->save($jsonOutput);
+
+    echo $jsonOutput;*/
+});
+// ***
+
 // ### API -  */categories*
 // ### Categories List (GET)
 // #### *JSON* - *STATIC CACHE*
@@ -273,6 +349,7 @@ function processRequest(\Slim\Slim $app, \Pimple $di, $from='', $where=''){
 
     }catch (\Exception $e){
         $Response = new \CQAtlas\Helpers\Response($app->response(),400,$e->getMessage());
+        $Response->addContent(array('trace' => $e->getTrace()[0]));
         $Response->show();
         $app->stop();
     }
@@ -288,6 +365,7 @@ function processRequest(\Slim\Slim $app, \Pimple $di, $from='', $where=''){
     $app->response()->body($jsonOutput); #echo $jsonOutput;
 }
 // ***
+
 
 // ### /logout
 // ### Logout Endpoint (GET)
@@ -499,6 +577,10 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
         $app->stop();
     }
 
+    // Flush Cache
+    $Cache = new \CQAtlas\Helpers\Cache($app, $di);
+    $Cache->bust('datasets');
+
     // BUILD PLACES INSERTS
     $batchInserts = array();
     foreach ($data->features as $place) {
@@ -528,9 +610,7 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
         //tags
         $tags = array();
         foreach ($properties as $field) {
-            $tags [] = array(
-                $field->title => $place->properties->{$field->title}
-            );
+            $tags[$field->title] = $place->properties->{$field->title};
         }
         $attributes->tags = json_encode($tags);
 
@@ -557,210 +637,6 @@ $app->post("/publish", $apiAuthenticate($app), function () use ($app, $di) {
     $Response = new \CQAtlas\Helpers\Response($app->response(),200,'ok');
     $Response->addContent($placesOutput);
     $Response->show();
-});
-// ***
-
-// ### /publish
-// ### Publish Dataset Endpoint (POST)[**A**]
-// ### *JSON*
-// Validate & publish datasets
-# $app->post("/distribute", $apiAuthenticate($app), function () use ($app, $di) {
-$app->get("/distribute", function () use ($app, $di) {
-
-    ini_set('memory_limit', '256M');
-    // #### Google Drive Operation Via Server-Side Web App (AppScript::CQ-Check)
-    // ##### >> Get Access Token From Spreadsheet API
-    require_once 'vendor/cqatlas/cqatlas/CqUtil.php';
-    $SpreadsheetAPI = new \CQAtlas\Helpers\SpreadsheetApi();
-    $SpreadsheetAPI->authenticate($di['google_user'], $di['google_password']);
-    $scriptOutput = $SpreadsheetAPI->appScript('AKfycbwqmysJ6SdLNoq1_NZ_njnjC9hWMcRkVU9lYN1Di2U5ZbdE2VYZ');
-
-    $appResponse = json_decode($scriptOutput['response']);
-    if($appResponse->results->filesCount == 0){
-        $app->stop();
-    }
-
-    //Download Sheets Files
-    $validatedFiles = array();
-    $pubPath = $di['storageDir'].'/publications';
-    $fileExtension = 'xls';
-    $results = array();
-/*    foreach ($appResponse->results->files as &$file) {
-        //$validatedFiles[$file->name] = $SpreadsheetAPI->getFile($file->id,$pubPath,$fileExtension);
-        $getResults = $SpreadsheetAPI->getFile($file->id,$pubPath,$fileExtension);
-        $file->status = $getResults['status'];
-        $file->path = $getResults['file'];
-        $results[] = $file;
-    }*/
-/*    echo '<pre><code>';
-    //print_r($appResponse);
-    //print_r($validatedFiles);
-    print_r($results);
-    echo '</code></pre>';
-    $app->stop();*/
-
-    // FAKE
-    $results = array();
-
-    $ressource = new stdClass;
-    $ressource->id = '0ArDvk7BRZ_yjdHl4OUlfUEc0ZWxpRjZyaS14aEFBLVE';
-    $ressource->name  =  '*V*_SUPER_BATCH';
-    $ressource->state ='validated';
-    $ressource->lastUpdated =  '2013-02-28T16:40:41.181Z';
-    $ressource->status= 200;
-    $ressource->path  = '/Applications/MAMP/htdocs/lmtl/www/collab_api/storage/publications/0ArDvk7BRZ_yjdHl4OUlfUEc0ZWxpRjZyaS14aEFBLVE.xlsx';
-
-    //$results[] = $ressource;
-
-    $ressource = new stdClass;
-    $ressource->id = '0ArDvk7BRZ_yjdGdOVDlFYUJoU0FjR0hpTlJjUFZRaFE';
-    $ressource->name  = 'omhm-test-1_1364237095';
-    $ressource->state ='validated';
-    $ressource->lastUpdated =  '2013-02-28T16:40:41.181Z';
-    $ressource->status= 200;
-    $ressource->path  = '/Applications/MAMP/htdocs/lmtl/www/collab_api/storage/publications/0ArDvk7BRZ_yjdGdOVDlFYUJoU0FjR0hpTlJjUFZRaFE.xlsx';
-
-    $results[] = $ressource;
-
-
-    //$sourcePath = sprintf('%s.%s', $pubPath, $fileExtension);
-    //$sourcePath = '/Applications/MAMP/htdocs/lmtl/www/collab_api/storage/0ArDvk7BRZ_yjdHl4OUlfUEc0ZWxpRjZyaS14aEFBLVE.xlsx';
-    foreach($results as $file){
-
-        $Excel = new \CQAtlas\Helpers\Excel();
-        $Excel->getSheet($file->path);
-
-        $metadatas = $Excel->getMetas();
-        $data = $Excel->getData();
-        $customFields = $Excel->getProperties();
-
-        $metas = new stdClass;
-
-        $metas->google_drive_id = $file->id;
-        $metas->collection_id = 0;
-        $metas->version = 1;
-        $metas->status = 1;
-        // todo: real user ID (Uploader)
-        $metas->created_by = $metadatas['created_by'];
-
-        $metas->attributions = $metadatas['source'];
-        $metas->licence = $metadatas['licence'];
-        $metas->description = $metadatas['description'];
-        $metas->name = $metadatas['nom'];
-        $metas->label = $metadatas['etiquette'];
-
-        $categories = explode(',',$metadatas['categories']);
-        $l = count($categories);
-
-        switch($l){
-            case ($l >= 3):
-                $metas->tertiary_category_id = $categories[2];
-            case 2:
-                $metas->secondary_category_id = $categories[1];
-            case 1:
-                $metas->primary_category_id = $categories[0];
-            break;
-        }
-        $metas->slug = CqUtil::slugify($metadatas['nom']);
-        $metas->file_uri = $metadatas['URI'];
-
-        // User Defined Fields
-        $dataset_extra_fields = [];
-        foreach ($customFields as $field) {
-            //if( substr($key,0,1) !== '_' ){
-                $dataset_extra_fields[] = array(
-                    'field' => $field['Champ'],
-                    'type'  => $field['Type'],
-                    'desc'  => $field['Description']
-                );
-            //}
-        }
-        $metas->dataset_extra_fields = json_encode($dataset_extra_fields);
-
-
-        $CartoDB = new \CQAtlas\Helpers\CartoDB($di);
-
-        # CartoDB Add to Datasets
-        try{
-            $datasetId = $CartoDB->createDataset($metas);
-        }catch (Exception $e){
-            echo "OUPS $e";
-        }
-
-/*        echo "<br>Dataset Created!<br>";
-        echo '<pre><code>';
-       // print_r($datasetId);
-       // print_r($customFields);
-       // print_r($metadatas);
-       // print_r($metas);
-       // print_r($data);
-        echo '</code></pre>';*/
-
-        // BUILD INSERTS
-        $batchInserts = array();
-        foreach ($data as $place) {
-            $attributes = new stdClass;
-            $attributes->the_geom = "ST_GeomFromText('POINT(".str_replace(',', ' ',$place['_lonlat']).")',4326)";
-            $attributes->address = $place['_formatted_address'];
-            $attributes->city = trim($place['_city']);
-            $attributes->postal_code = trim($place['_postal_code']);
-            $attributes->created_by = $metas->created_by;
-            $attributes->dataset_id = $datasetId;
-            $attributes->label = $place[$metas->label];
-            $attributes->latitude = $place['_lat'];
-            $attributes->longitude = $place['_lon'];
-            $attributes->latitude = $place['_lat'];
-
-            $attributes->name_fr = (array_key_exists('nom',$place))?$place['nom']:'';
-           // $attributes->desc = (array_key_exists('description',$place))?$place['description']:'';
-            $attributes->tel_number = (array_key_exists('telephone',$place))?$place['telephone']:'';
-            $attributes->website = (array_key_exists('web',$place))?$place['web']:'';
-
-            echo '<pre><code>';
-            print_r($metadatas);
-            print_r($metas);
-            echo '</code></pre>';
-
-            if($metadatas['c_categorie'] === ''){
-                $attributes->primary_category_id = $place[$metadatas['c_categorie']];
-            }else{
-                $attributes->primary_category_id = $metas->primary_category_id;
-                $attributes->secondary_category_id = $metas->secondary_category_id;
-            }
-
-            //tags
-            $tags = array();
-            foreach ($customFields as $field) {
-                $tags [] = array(
-                    $field['Champ'] => $place[$field['Champ']]
-                );
-            }
-            $attributes->tags = json_encode($tags);
-
-            foreach ($attributes as $key=>&$val) {
-                if($val === ''){
-                    $val = 'NULL';
-                }
-            }
-
-
-            $batchInserts[] = $attributes;
-        }
-
-        # CartoDB Add to Datasets
-        try{
-            $response = $CartoDB->addPlaces($batchInserts);
-        }catch (Exception $e){
-            echo "AddPlaces :: $e";
-        }
-        echo '<pre><code>';
-        print_r($response);
-        echo '</code></pre>';
-    }
-
-
-    $app->stop();
-
 });
 // ***
 
