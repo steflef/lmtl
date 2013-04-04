@@ -1,6 +1,7 @@
 function MapCtrl($rootScope, $scope, $filter, $http) {
     $scope.test = "supreDUper";
     self = $scope;
+    root = $rootScope;
 
    $scope.setGeoFilter = function(feature){
 
@@ -81,5 +82,7 @@ function MapCtrl($rootScope, $scope, $filter, $http) {
                 }
             }
         }
+
+        root.$broadcast("marked");
     });
 }

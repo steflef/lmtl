@@ -5300,6 +5300,9 @@ h6 {
 .isRelative {
   position: relative;
 }
+.border-test {
+  border: 1px solid #f00;
+}
 /* Patterns.less
  * Repeatable UI elements outside the base styles provided from the scaffolding
  * ---------------------------------------------------------------------------- */
@@ -5463,7 +5466,7 @@ h6 {
   top: 0px;
   bottom: 0px;
   width: 100%;
-  z-index: 2;
+  z-index: 3;
   opacity: 0.5;
 }
 #overlay .ui-msgbox {
@@ -5612,45 +5615,170 @@ h6 {
 .label-soft-inverse[href] {
   background-color: #1a1a1a;
 }
-.datasets {
+/*
+
+.datasets{
   background-color: #e6e6e6;
   bottom: 0;
   border-right: 1px solid #DCD9CE;
+  //box-shadow: 0px 0px 2px rgba(50, 50, 50, 0.4);
   left: 0;
-  padding: 0;
+  padding:0;
   overflow-x: hidden;
   overflow-y: scroll;
   position: absolute;
   top: 40px;
   width: 220px;
   z-index: 5;
-}
-.datasets .box {
-  overflow: hidden;
-  /*    background-color: #F6F4EE;
-    border-bottom:1px solid #DCD9CE;*/
+  .box{
+    //margin-bottom: 1px;
+    overflow: hidden;
 
-  background-color: #E3E3E3;
-  border-bottom: 1px solid #ddd;
-  color: #666;
-  font-size: 11px;
-  font-family: 'OpenSansBold', 'OpenSans', Helvetica, Arial, sans-serif;
-  padding: 8px;
-  position: relative;
+*/
+/*    background-color: #F6F4EE;
+    border-bottom:1px solid #DCD9CE;*//*
+
+    background-color: #E3E3E3;
+    border-bottom: 1px solid #ddd;
+
+    color:#666;
+    font-size: 11px;
+    font-family: 'OpenSansBold','OpenSans', Helvetica, Arial, sans-serif;
+
+    padding: 8px;
+    position: relative;
+  }
+  .selected{
+    background-color: #EEE;
+  }
 }
-.datasets .selected {
-  background-color: #EEE;
+*/
+.perspective {
+  -webkit-perspective: 800px;
+  -moz-perspective: 800px;
+  -o-perspective: 800px;
+  perspective: 8000px;
+  border: 1px solid #ccc;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+}
+.datasets_ui {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  width: 100%;
+  z-index: 3;
+  -webkit-transition-duration: 1s;
+  -moz-transition-duration: 1s;
+  -o-transition-duration: 1s;
+  transition-duration: 1s;
+  -webkit-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  -o-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-transform-origin: right center;
+  -moz-transform-origin: right center;
+  -o-transform-origin: right center;
+  transform-origin: right center;
+  /*  -webkit-perspective: 800px;
+  -moz-perspective: 800px;
+  -o-perspective: 800px;
+  perspective: 800px;*/
+
+}
+.datasets_ui .datasets_panel {
+  background-color: #ddd;
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  width: 100%;
+  opacity: 1;
+}
+.datasets_ui .datasets_panel .datasets_list {
+  padding: 20px;
+  position: absolute;
+  bottom: 0;
+  top: 40px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.datasets_ui .datasets_panel .datasets_list .fbm .pull-right {
+  color: #fff;
+}
+.datasets_ui .datasets_panel .datasets_list .watcher-well {
+  background-color: #eee;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: 1px 1px 1px 0px #666666;
+  -moz-box-shadow: 1px 1px 1px 0px #666666;
+  box-shadow: 1px 1px 1px 0px #666666;
+  margin: 2px;
+  margin-bottom: 20px;
+  min-height: 40px;
+  padding: 6px;
+  border: 8px solid #fff;
+}
+.easeIn {
+  -webkit-transform: rotate(0deg);
+  -moz-transform: rotate(0deg);
+  -ms-transform: rotate(0deg);
+  -o-transform: rotate(0deg);
+  transform: rotate(0deg);
+}
+.easeOut {
+  -webkit-transform: rotateY(90deg);
+  opacity: 0;
+}
+.location-toolbar {
+  position: fixed;
+  top: 40px;
+  height: 30px;
+  left: -1px;
+  right: 0;
+  background-color: #000;
+  opacity: .8;
+  z-index: 2;
+}
+.location-toolbar ul {
+  list-style: none;
+}
+.location-toolbar ul li {
+  color: #fff;
+  float: left;
+  font-family: OpenSansBold, OpenSans, Sans;
+  line-height: 30px;
+  margin-right: 20px;
+}
+.location-toolbar ul li i {
+  line-height: 30px;
+}
+.location-toolbar ul li a {
+  color: #fff;
+  font-family: OpenSansBold, OpenSans, Sans;
+  line-height: 30px;
+  text-decoration: none;
 }
 .places {
   background-color: #E6E6E6;
   box-shadow: 1px 0px 3px rgba(50, 50, 50, 0.4);
   position: absolute;
-  top: 40px;
+  top: 70px;
   bottom: 0;
-  width: 320px;
+  width: 340px;
   overflow-x: hidden;
   z-index: 3;
-  left: 220px;
+  left: 0px;
+}
+.places .no-places {
+  margin: 8px;
+  background-color: #fff;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  padding: 10px 20px;
 }
 .places .box {
   background-color: #F6F4EE;
@@ -5697,15 +5825,18 @@ h6 {
   border-bottom: 1px solid #ddd;
 }
 .place-details {
-  background-color: #666;
+  background-color: #fff;
   box-shadow: 1px 0px 3px rgba(50, 50, 50, 0.4);
   position: absolute;
-  top: 40px;
+  top: 70px;
   bottom: 0;
-  width: 320px;
+  width: 340px;
   overflow-x: hidden;
   z-index: 3;
   left: 220px;
+}
+.place-details h4 {
+  margin-top: 2px;
 }
 .place-details .box {
   background-color: #F6F4EE;
@@ -5713,11 +5844,10 @@ h6 {
   padding: 8px;
   position: relative;
 }
+.place-details .loading {
+  text-align: center;
+}
 .flip-container {
-  /*  width: 320px;
-  height: 800px;
-  position: relative;*/
-
   position: absolute;
   top: 0;
   bottom: 0;
@@ -5727,9 +5857,9 @@ h6 {
   perspective: 800px;
 }
 #panel {
-  width: 320px;
+  width: 340px;
   height: 100%;
-  top: 40px;
+  top: 70px;
   bottom: 0;
   -webkit-transition: -webkit-transform 1s;
   -moz-transition: -moz-transform 1s;
@@ -5745,18 +5875,18 @@ h6 {
   transform-origin: right center;
 }
 #panel.flipped {
-  -webkit-transform: translateX(120px) rotateY(-180deg);
-  -moz-transform: translateX(120px) rotateY(-180deg);
-  -o-transform: translateX(120px) rotateY(-180deg);
-  transform: translateX(120px) rotateY(-180deg);
+  -webkit-transform: translateX(-340px) rotateY(-180deg);
+  -moz-transform: translateX(-340px) rotateY(-180deg);
+  -o-transform: translateX(-340px) rotateY(-180deg);
+  transform: translateX(-340px) rotateY(-180deg);
 }
 #panel .face {
   display: block;
   position: absolute;
-  width: 320px;
+  width: 340px;
   bottom: 0;
-  top: 40px;
-  left: 220px;
+  top: 70px;
+  left: 0px;
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   -o-backface-visibility: hidden;
@@ -5767,6 +5897,18 @@ h6 {
   -moz-transform: rotateY(180deg);
   -o-transform: rotateY(180deg);
   transform: rotateY(180deg);
+}
+.details_ui .details_panel {
+  background-color: #ccc;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 80px;
+  width: 400px;
+  z-index: 2;
+}
+.details_ui .details_panel .details_content {
+  padding: 10px;
 }
 .validation-list {
   background-color: #eee;
@@ -5784,4 +5926,98 @@ h6 {
 }
 .validation-list ul li {
   margin: 4px 0;
+}
+.app_header {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  left: 0;
+  height: 67px;
+  color: white;
+  z-index: 100;
+}
+.scrollable {
+  border: 1px solid #f00;
+  margin-left: 255px;
+}
+.scrollable .main_content {
+  border: 1px solid #f00;
+  padding-right: 20px;
+  min-width: 400px;
+}
+.desktop {
+  border: 1px solid #f00;
+  position: relative;
+  overflow: hidden;
+}
+.allowMask .Scrollable_Scrollbar {
+  border: 1px solid #f00;
+  z-index: 99;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+.allowMask .Scrollable_Scrollbar .vertical {
+  border: 1px solid #f00;
+  top: 86px;
+  bottom: 110px;
+}
+.allowMask .Scrollable_Scrollbar .scroller {
+  border: 1px solid #f00;
+  padding-top: 87px;
+  padding-bottom: 110px;
+}
+.app_Main {
+  bottom: 90px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.app_Main .app_MainNav {
+  border: 1px solid #f00;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  width: 215px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 215px;
+  margin: 0px 20px;
+}
+.app_Main .app_MainNav .Scrollable {
+  border: 1px solid #f00;
+  margin-left: 255px;
+}
+.app_Main .app_MainNav .Scrollable .main_content {
+  border: 1px solid #f00;
+  padding-right: 20px;
+  min-width: 400px;
+}
+.app_Main .right_sidebar {
+  border: 1px solid #f00;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  width: 215px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  margin: 0px 5px 0px 10px;
+}
+.app_Main .right_sidebar .Scrollable {
+  border: 1px solid #f00;
+  margin-left: 255px;
+}
+.app_Main .right_sidebar .Scrollable .main_content {
+  border: 1px solid #f00;
+  padding-right: 20px;
+  min-width: 400px;
 }

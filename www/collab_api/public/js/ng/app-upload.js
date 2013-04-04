@@ -187,6 +187,15 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
         $scope.$on('loadEnd', function () {
             self.hideLoader();
         });
+        $scope.$on('showMsg', function () {
+            var msg = arguments[1] || {title:"",text:""};
+            self.showMsg(msg);
+
+            setTimeout(function(){
+                    self.hideMsg();
+                },5000
+            );
+        });
 
         $scope.$on('newPublication', function () {
 
@@ -201,16 +210,6 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                 },3000
             );
 
-        });
-
-        $scope.$on('showMsg', function () {
-            var msg = arguments[1] || {title:"",text:""};
-            self.showMsg(msg);
-
-            setTimeout(function(){
-                self.hideMsg();
-            },5000
-            );
         });
 
         $scope.$watch('step', function(newValue) {
@@ -406,8 +405,6 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
 
             var target = document.createElement("div");
             target.id = "overlay";
-            //target.style.cssText = 'background-color:#fff;position:fixed;top:0;bottom:0;width:100%;z-index:2;opacity:.5;';
-
 
             var uiOverlay = document.createElement("div");
             uiOverlay.className = "ui-overlay";

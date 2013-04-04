@@ -2,7 +2,7 @@
 <html class="no-js" ng-app="appMain">
 <head>
     <meta http-equiv="Content-Type" content="charset=utf-8"/>
-    <title>LMTL DEV [ng]</title>
+    <title>Tableau de bord [lmtl]</title>
     <meta name="description" content="">
     <meta name="author" content="">
     <base href="<?=$base_url?>" />
@@ -15,9 +15,6 @@
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.css"/>
     <link rel="stylesheet" href="./public/js/libs/leaflet/markercluster/MarkerCluster.css"/>
     <link rel="stylesheet" href="./public/js/libs/leaflet/markercluster/MarkerCluster.Default.css"/>
-
-    <link rel="stylesheet" href="./public/js/libs/overlay/css/custom.css">
-    <link rel="stylesheet" href="./public/js/libs/overlay/css/iosOverlay.css">
 
     <style type="text/css">
 /*        .leaflet-left .leaflet-control {
@@ -53,23 +50,24 @@
     <script type="text/javascript" src="//documentcloud.github.com/underscore/underscore-min.js"></script>
     <script type="text/javascript" src="./public/js/ng/ctrl/map.js"></script>
     <script type="text/javascript" src="./public/js/ng/ctrl/toolbar.js"></script>
-    <script type="text/javascript" src="./public/js/ng/app-tb.js"></script>
+    <script type="text/javascript" src="./public/js/ng/app-tb-datasets.js"></script>
     <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.js"></script>
     <script type="text/javascript" src="./public/js/libs/leaflet/markercluster/leaflet.markercluster.js"></script>
     <script type="text/javascript" src="./public/js/libs/bootstrap/bootstrap-dropdown.js"></script>
-
-    <script src="./public/js/libs/overlay/js/iosOverlay.js"></script>
-    <script src="./public/js/libs/overlay/js/spin.min.js"></script>
 </head>
 <body>
+<header class="app_header">
+    <nav>
+        <div ng-controller="ToolBarCtrl"><toolbar></toolbar></div>
+    </nav>
 
-<div ng-controller="ToolBarCtrl"><toolbar></toolbar></div>
-<noscript>
-    <div class="translate" id="noscript">
-        <h3>Tu dois activer JavaScript pour naviguer sur cette application</h3>
-        <p>Nous utilisons les meilleures technologies de pointe disponibles pour offrir à nos utilisateurs une expérience Web optimale.
-            <br/>Il est recommandé d'activer JavaScript dans les paramètres du navigateur pour continuer.
-        </p>
-        <p class="small">Contactez un administrateur pour plus d'informations</p>
-    </div>
-</noscript>
+    <noscript>
+        <div class="translate" id="noscript">
+            <h3>Tu dois activer JavaScript pour naviguer sur cette application</h3>
+            <p>Nous utilisons les meilleures technologies de pointe disponibles pour offrir à nos utilisateurs une expérience Web optimale.
+                <br/>Il est recommandé d'activer JavaScript dans les paramètres du navigateur pour continuer.
+            </p>
+            <p class="small">Contactez un administrateur pour plus d'informations</p>
+        </div>
+    </noscript>
+</header>
