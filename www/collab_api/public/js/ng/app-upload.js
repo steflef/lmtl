@@ -77,7 +77,6 @@ angular.module('appMain', ['ngSanitize','ngUpload'])
                         hash.splice(_.indexOf(hash,id),1);
                     }
                 })
-
             });
         };
 

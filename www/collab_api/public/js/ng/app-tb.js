@@ -26,10 +26,11 @@ angular.module('appMain', ['ngSanitize'])
 
         var linker = function(scope, element, attrs) {
             //console.log(scope);
-            scope.map = new L.Map(attrs.id, {'scrollWheelZoom':false});
+            scope.map = new L.Map(attrs.id, {'scrollWheelZoom':false, left:"340px"});
             scope.map.attributionControl.setPrefix('');
             scope.markersLayer = new L.LayerGroup();
-            scope.markers = new L.MarkerClusterGroup({showCoverageOnHover:false});
+            //scope.markers = new L.MarkerClusterGroup({showCoverageOnHover:false});
+            scope.markers = new L.MarkerClusterGroup({ showCoverageOnHover: false, animateAddingMarkers : true });
             var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 osmAttrib = 'Map data © openstreetmap contributors',
                 osm = new L.TileLayer(osmUrl, {minZoom:8, maxZoom:18, attribution:osmAttrib}),
@@ -40,7 +41,7 @@ angular.module('appMain', ['ngSanitize'])
 
             //jQuery stuff
             // Todo Convert to Angular Model, DOM oriented right now :(
-            var mapStretch = {
+/*            var mapStretch = {
                 min:function () {
                     $(".mapColumn").removeClass("maximazer");
                     $(".contentColumns").removeClass("minimazer");
@@ -67,13 +68,48 @@ angular.module('appMain', ['ngSanitize'])
 
             $(".map-pull").click(function () {
                 mapStretch.max();
-            });
+            });*/
         };
 
         return{
             restrict:'A',
             link:linker
         }
+    })
+
+    .directive('updatemodelonblur', function() {
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            link: function(scope, elm, attr, ngModelCtrl)
+            {
+                if(attr.type === 'radio' || attr.type === 'checkbox')
+                {
+                    return;
+                }
+
+                // Update model on blur only
+                elm.unbind('input').unbind('keydown').unbind('change');
+                var updateModel = function()
+                {
+                    scope.$apply(function()
+                    {
+                        ngModelCtrl.$setViewValue(elm.val());
+                    });
+                };
+                elm.bind('blur', updateModel);
+
+                // Not a textarea
+                if(elm[0].nodeName.toLowerCase() !== 'textarea')
+                {
+                    // Update model on ENTER
+                    elm.bind('keydown', function(e)
+                    {
+                        e.which == 13 && updateModel();
+                    });
+                }
+            }
+        };
     })
 
     .filter('sub', function () {
@@ -109,6 +145,7 @@ angular.module('appMain', ['ngSanitize'])
         $scope.datasets = [];
         $scope.places = [];
         $scope.place = {};
+        $scope.cat = {};
         $scope.datasets_panel = "easeIn";
 
         $scope.init = function(){
@@ -254,6 +291,20 @@ angular.module('appMain', ['ngSanitize'])
             self.hideMsg();
         });
 
+        $scope.$on('newMapCenter', function ($scope, Point) {
+            self.place.location.latitude = Point.LatLng.lat;
+            self.place.location.longitude = Point.LatLng.lng;
+
+            var tempPlace = _.find(self.places, function(item){ return item.id == Point.id; });
+            console.log(tempPlace);
+            tempPlace.location.latitude = Point.LatLng.lat;
+            tempPlace.location.longitude = Point.LatLng.lng;
+
+            $rootScope.$broadcast("setMarkers", self.places);
+
+            self.$broadcast("hideMsg");
+        });
+
         $scope.$on('newDatasets', function ($scope, oData) {
 
             console.log('EVENT newDatasets');
@@ -265,6 +316,7 @@ angular.module('appMain', ['ngSanitize'])
             }else{
                 //self.$broadcast("loadEnd");
                 self.$broadcast("hideMsg");
+                self.getCategories();
                 //self.getPlaces( oData.results[0].id );
             }
         });
@@ -279,6 +331,8 @@ angular.module('appMain', ['ngSanitize'])
             self.places = oData.results;
             $rootScope.$broadcast("setMarkers", oData.results);
             self.$broadcast("hideMsg");
+
+
         });
 
         $scope.$on('marked', function () {
@@ -290,7 +344,28 @@ angular.module('appMain', ['ngSanitize'])
             console.log(oData);
             self.place = oData.results;
             self.$broadcast("hideMsg");
+
             self.safeApply();
+
+            //Categories
+            var selectedCategorie = [];
+            var primaryId = self.place.categories.primary_category.id;
+            var secondaryId = self.place.categories.secondary_category.id;
+            _.each(self.cat.options, function(item){
+                //console.log(item.id + " ==? "+ self.place.categories.primary_category.id);
+
+                if(item.id == primaryId ){
+                    selectedCategorie[0] = item;
+                }
+                if(item.id == secondaryId){
+                    selectedCategorie[1] = item;
+                }
+            });
+            console.log("Categories");
+            console.log(selectedCategorie);
+            console.log("-----------------");
+            self.selectedCategorie = selectedCategorie;
+
         });
 
         // HTTP GET DATASET
@@ -365,6 +440,101 @@ angular.module('appMain', ['ngSanitize'])
                 });
         };
 
+        $scope.getCategories = function(){
+            console.log("Get Categories");
+            var self = $scope;
+            self.$broadcast("showMsg",{title:"Connexion au serveur",text:"Chargement des catégories en cours"});
+            $http.get("./categories").
+                success(function(data) {
+                    $scope.cat.options = data.results;
+                    self.$broadcast("hideMsg");
+                }).
+                error(function(data, status) {
+                    console.log(status);
+                    console.log(data);
+                });
+        }
+
+        $scope.setMapCenter = function(){
+            $rootScope.$broadcast("setMapCenter", {lon:self.place.location.longitude,lat:self.place.location.latitude});
+        }
+
+        $scope.getMapCenter = function(){
+            self.$broadcast("showMsg",{title:"Calcul en cours",text:"Position du lieux"});
+            $rootScope.$broadcast("getMapCenter", {id:self.place.id});
+        }
+
+        $scope.reverseGeocoding = function(){
+            // reverse geocode with Google
+            if (typeof self.geocoder === 'undefined') {
+                self.geocoder = new google.maps.Geocoder();
+            }
+
+
+            var location = new google.maps.LatLng(self.place.location.latitude, self.place.location.longitude);
+            self.geocoder.geocode( {'latLng': location}, function(results, status) {
+
+                if (status == google.maps.GeocoderStatus.OK) {
+                    //var lon = results[0].geometry.location.lng();
+                    //var lat = results[0].geometry.location.lat();
+                    var location_type = results[0].geometry.location_type;
+                    var address_components = results[0].address_components;
+                    var formatted_address = results[0].formatted_address;
+                    var postal_code ="";
+                    var city = "";
+                    var street_number = "";
+                    var route = "";
+
+                    _.each(address_components, function(item){
+                        console.log(item.types[0] + " >> " + item.long_name);
+                        if( item.types[0] === "postal_code"){
+                            self.place.location.postal_code = item.long_name;
+                        }
+
+                        if( item.types[0] === "locality"){
+                            self.place.location.city = item.long_name;
+                        }
+
+                        if( item.types[0] === "street_number"){
+                            street_number = item.long_name;
+                        }
+
+                        if( item.types[0] === "route"){
+                            route = item.long_name;
+                        }
+                    });
+
+                    self.place.location.address = street_number + " " + route;
+                    self.place.location.service = "Google";
+                    self.place.location.location_type = location_type;
+                    self.safeApply();
+/*                    var location = {
+
+                        "location_type" : location_type,
+                        "formatted_address" : formatted_address,
+                        "postal_code" : postal_code,
+                        "city" : city,
+                        "service" : "Google"
+                    };*/
+                    //console.log(location);
+
+/*                    self.uData.features[targetRow].geometry.coordinates = [lon,lat];
+                    self.uData.features[targetRow]._geo = location;
+
+                    self.geoConsole = "ID:"+targetRow+" ["+adr+"] : ("+lon+","+lat+")";
+                    self.geoLog += "\n" + self.geoConsole;
+                    self.safeApply();
+                    timer = 800;
+                    self.geoIndex = pos;
+                    responseCount ++;
+                    pos ++;*/
+
+                } else
+                {
+                    console.log(status);
+                }
+            });
+        }
 
         $scope.getScope = function(){
             console.log($scope);

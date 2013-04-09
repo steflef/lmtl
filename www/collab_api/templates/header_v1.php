@@ -12,7 +12,7 @@
     <![endif]-->
 
     <link rel="stylesheet" href="./public/style/bootstrap.css">
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.css"/>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.css"/>
     <link rel="stylesheet" href="./public/js/libs/leaflet/markercluster/MarkerCluster.css"/>
     <link rel="stylesheet" href="./public/js/libs/leaflet/markercluster/MarkerCluster.Default.css"/>
 
@@ -54,9 +54,12 @@
     <script type="text/javascript" src="./public/js/ng/ctrl/map.js"></script>
     <script type="text/javascript" src="./public/js/ng/ctrl/toolbar.js"></script>
     <script type="text/javascript" src="./public/js/ng/app-tb.js"></script>
-    <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.js"></script>
-    <script type="text/javascript" src="./public/js/libs/leaflet/markercluster/leaflet.markercluster.js"></script>
+    <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script>
+    <script type="text/javascript" src="./public/js/libs/leaflet/markercluster/leaflet.markercluster-src.js"></script>
     <script type="text/javascript" src="./public/js/libs/bootstrap/bootstrap-dropdown.js"></script>
+    <script type="text/javascript" src="./public/js/libs/bootstrap/bootstrap-transition.js"></script>
+    <script type="text/javascript" src="./public/js/libs/bootstrap/bootstrap-modal.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
     <script src="./public/js/libs/overlay/js/iosOverlay.js"></script>
     <script src="./public/js/libs/overlay/js/spin.min.js"></script>

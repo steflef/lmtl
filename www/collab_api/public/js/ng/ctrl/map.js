@@ -85,4 +85,14 @@ function MapCtrl($rootScope, $scope, $filter, $http) {
 
         root.$broadcast("marked");
     });
+
+    $scope.$on('setMapCenter', function ($scope, Point) {
+        var location = new L.LatLng(Point.lat, Point.lon);
+
+        self.map.setView(location, 18);
+    });
+
+    $scope.$on('getMapCenter', function ($scope, Point) {
+        root.$broadcast("newMapCenter",   {LatLng:self.map.getCenter(),id:Point.id});
+    });
 }

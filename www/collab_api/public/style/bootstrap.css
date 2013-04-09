@@ -5754,6 +5754,7 @@ h6 {
 }
 .location-toolbar ul li i {
   line-height: 30px;
+  margin-top: 2px;
 }
 .location-toolbar ul li a {
   color: #fff;
@@ -5801,6 +5802,7 @@ h6 {
 .places .box .right-space {
   position: relative;
   margin-left: 44px;
+  margin-right: 10px;
 }
 .places .box .right-space section .btn {
   margin-right: 8px;
@@ -5846,6 +5848,21 @@ h6 {
 }
 .place-details .loading {
   text-align: center;
+}
+.place-details .place-details-content ul {
+  list-style: none;
+  margin: 0;
+}
+.place-details .place-details-content ul li.level1-list,
+.place-details .place-details-content ul li.level2-list {
+  border-bottom: 1px solid #969696;
+  border-left: 4px solid #969696;
+  padding-left: 8px;
+  margin-bottom: 4px;
+}
+.place-details .place-details-content ul li.level2-list {
+  border-bottom: 1px solid #ccc;
+  border-left: 4px solid #ccc;
 }
 .flip-container {
   position: absolute;
@@ -5926,6 +5943,41 @@ h6 {
 }
 .validation-list ul li {
   margin: 4px 0;
+}
+.map-wrapper {
+  margin-left: 340px;
+  right: 0;
+  position: absolute;
+  left: 0;
+  top: 70px;
+  bottom: 0;
+  z-index: 1;
+}
+.map-wrapper #mapPort {
+  margin: 0;
+  padding: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  overflow: hidden;
+}
+.map-wrapper .crosshair {
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  background: transparent url(../img/crosshair.png) 0 0 no-repeat scroll;
+  top: 50%;
+  left: 50%;
+  margin: -32.5px 0 0 -32.5px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.5;
+}
+a.pseudo-btn:hover .badge,
+a.pseudo-btn:hover .label {
+  background-color: #666;
 }
 .app_header {
   position: fixed;
