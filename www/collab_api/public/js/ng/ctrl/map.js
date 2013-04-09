@@ -95,4 +95,16 @@ function MapCtrl($rootScope, $scope, $filter, $http) {
     $scope.$on('getMapCenter', function ($scope, Point) {
         root.$broadcast("newMapCenter",   {LatLng:self.map.getCenter(),id:Point.id});
     });
+
+    $scope.$on('geoLocation', function(){
+        self.map.stopLocate();
+        var locate = self.map.locate({
+            setView: true,
+            maxZoom: 18//,
+            //maximumAge: 3000,
+            //enableHighAccuracy: true//,
+            //watch: true
+        });
+        console.log(locate);
+    });
 }

@@ -142,6 +142,28 @@ angular.module('appMain', ['ngSanitize'])
         };
 
         var self = $scope;
+
+        $scope.isMobile = {
+            Android: function() {
+                return navigator.userAgent.match(/Android/i);
+            },
+            BlackBerry: function() {
+                return navigator.userAgent.match(/BlackBerry/i);
+            },
+            iOS: function() {
+                return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+            },
+            Opera: function() {
+                return navigator.userAgent.match(/Opera Mini/i);
+            },
+            Windows: function() {
+                return navigator.userAgent.match(/IEMobile/i);
+            },
+            any: function() {
+                return (self.isMobile.Android() || self.isMobile.BlackBerry() || self.isMobile.iOS() || self.isMobile.Opera() || self.isMobile.Windows());
+            }
+        };
+
         $scope.datasets = [];
         $scope.places = [];
         $scope.place = {};
@@ -153,7 +175,7 @@ angular.module('appMain', ['ngSanitize'])
             //$scope.$broadcast("load","Connexion");
             $scope.$broadcast("showMsg",{title:"Initialisation",text:"Connexion au serveur"});
             //$scope.$broadcast("showMsg",{title:"Chargement",text:"test ..."});
-
+            console.log( self.isMobile.any());
             $scope.getDatasets();
         };
 
@@ -535,6 +557,11 @@ angular.module('appMain', ['ngSanitize'])
                 }
             });
         }
+
+        $scope.geoLocation = function() {
+            $rootScope.$broadcast("geoLocation");
+        }
+
 
         $scope.getScope = function(){
             console.log($scope);

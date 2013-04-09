@@ -59,7 +59,7 @@
                     <li style="float: right;">{{datasets[0].name}}</li>
                     <li><a href="#" onclick="return false;" ng-click="showDatasets()"><i class="icon-th-large icon-white"></i> Menu</a></li>
                     <li><a href=""><i class="icon-plus icon-white"></i> Ajouter un lieu</a></li>
-                    <li><a href=""><i class="icon-map-marker icon-white"></i> Ma localisation</a></li>
+                    <li ng-show="isMobile.any()"><a href="#" onclick="return false;" ng-click="geoLocation()"><i class="icon-map-marker icon-white"></i> Ma localisation</a></li>
                     <li><a href="#" onclick="$('#myModal').modal({show:true,backdrop:'static'});return false;">Launch demo modal</a></li>
                 </ul>
             </div>
