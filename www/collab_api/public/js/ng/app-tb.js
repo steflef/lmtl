@@ -1,3 +1,15 @@
+/*var consoleHolder = console;
+function debug(bool){
+    if(!bool){
+        consoleHolder = console;
+        console = {};
+        console.log = function(){};
+    }else
+        console = consoleHolder;
+        console.log("Console activated")
+}
+debug(false);*/
+
 angular.module('appMain', ['ngSanitize'])
 
 //    .config(function ($routeProvider, $locationProvider) {
@@ -21,6 +33,22 @@ angular.module('appMain', ['ngSanitize'])
                 link:linker
             }
         })
+
+    .directive('test', function ($compile) {
+
+        var linker = function(scope, element, attrs) {
+            attrs.$set('ng-click', "showDetails()");
+            element.append($compile('<a href="#" class="pseudo-btn" ng-click="showDetails(\''+attrs.rel+'\')" onclick="return false;"><span class="label">Afficher la fiche détaillée</span></a>')(scope));
+        };
+        return{
+            restrict:'E',
+            replace: true,
+            transclude: true,
+            //template: '<a href="#" class="pseudo-btn" ng-click="showDetails({{rel}})" onclick="return false;"><span class="label">Afficher le test</span></a>'
+            template: '<p></p>',
+            link: linker
+        }
+    })
 
     .directive('map', function () {
 
@@ -163,32 +191,67 @@ angular.module('appMain', ['ngSanitize'])
                 return (self.isMobile.Android() || self.isMobile.BlackBerry() || self.isMobile.iOS() || self.isMobile.Opera() || self.isMobile.Windows());
             }
         };
-
         $scope.datasets = [];
         $scope.places = [];
         $scope.place = {};
         $scope.cat = {};
+        $scope.selectedDataset = "";
         $scope.datasets_panel = "easeIn";
+        $scope.place_panel = "";
+        $scope.modal = {
+            display: false,
+            header: {
+                title: "Modal Title"
+            },
+            body: {
+                head:"",
+                content:[]
+            },
+            footer: {
+                btnLeft:"",
+                btnRight:""
+            },
+            btn:{
+                target: function(){},
+                display: false,
+                text: ""
+            },
+            show: function(){
+                this.display = true;
+            },
+            hide: function(){
+                this.display = false;
+            },
+            setContent: function(content){
+                this.body = content;
+            },
+            setTitle: function(content){
+                this.header.title = content;
+            }
+        };
+        $scope.inverseGeocode = {};
+        $scope.mode = "read";
+        $scope.editMode = false;
+
+        $scope.placeDetailsCache = {};
 
         $scope.init = function(){
             console.log('INIT');
             //$scope.$broadcast("load","Connexion");
             $scope.$broadcast("showMsg",{title:"Initialisation",text:"Connexion au serveur"});
             //$scope.$broadcast("showMsg",{title:"Chargement",text:"test ..."});
-            console.log( self.isMobile.any());
+            //console.log( self.isMobile.any());
             $scope.getDatasets();
-        };
-
-        $scope.test = function(){
-            console.log($scope);
         };
 
         $scope.showDatasets = function(){
             $scope.datasets_panel = "easeIn";
         }
+
         $scope.hideDatasets = function(){
             $scope.datasets_panel = "easeOut";
         }
+
         $scope.showLoader = function(text){
             if($scope.overlay){
                 return false;
@@ -239,7 +302,7 @@ angular.module('appMain', ['ngSanitize'])
         };
 
         $scope.showMsg = function(msg){
-            console.log("showMsg");
+            //console.log("showMsg");
             if($scope.overlayMsg){
                 return false;
             }
@@ -298,6 +361,7 @@ angular.module('appMain', ['ngSanitize'])
         $scope.$on('showMsg', function () {
             var msg = arguments[1] || {title:"",text:""};
             var flash = arguments[2] || false;
+
             self.showMsg(msg);
 
             if(flash){
@@ -322,9 +386,10 @@ angular.module('appMain', ['ngSanitize'])
             tempPlace.location.latitude = Point.LatLng.lat;
             tempPlace.location.longitude = Point.LatLng.lng;
 
-            $rootScope.$broadcast("setMarkers", self.places);
+            $rootScope.$broadcast("setMarkers", {Places:self.places});
 
             self.$broadcast("hideMsg");
+            self.reverseGeocoding();
         });
 
         $scope.$on('newDatasets', function ($scope, oData) {
@@ -351,10 +416,8 @@ angular.module('appMain', ['ngSanitize'])
             self.hideDatasets();
             self.safeApply();
             self.places = oData.results;
-            $rootScope.$broadcast("setMarkers", oData.results);
+            $rootScope.$broadcast("setMarkers", {Places:oData.results,zoomToBounds:true});
             self.$broadcast("hideMsg");
-
-
         });
 
         $scope.$on('marked', function () {
@@ -365,17 +428,12 @@ angular.module('appMain', ['ngSanitize'])
             console.log('EVENT newPlace');
             console.log(oData);
             self.place = oData.results;
-            self.$broadcast("hideMsg");
-
-            self.safeApply();
 
             //Categories
             var selectedCategorie = [];
             var primaryId = self.place.categories.primary_category.id;
             var secondaryId = self.place.categories.secondary_category.id;
             _.each(self.cat.options, function(item){
-                //console.log(item.id + " ==? "+ self.place.categories.primary_category.id);
-
                 if(item.id == primaryId ){
                     selectedCategorie[0] = item;
                 }
@@ -383,11 +441,13 @@ angular.module('appMain', ['ngSanitize'])
                     selectedCategorie[1] = item;
                 }
             });
-            console.log("Categories");
-            console.log(selectedCategorie);
-            console.log("-----------------");
-            self.selectedCategorie = selectedCategorie;
 
+            self.selectedCategorie = selectedCategorie;
+            self.safeApply();
+        });
+
+        $scope.$on('markerShowDetails', function ($scope, oData) {
+            self.getPlace(oData.id);
         });
 
         // HTTP GET DATASET
@@ -419,6 +479,7 @@ angular.module('appMain', ['ngSanitize'])
         $scope.getPlaces = function(datasetId){
 
             var self = $scope;
+            self.selectedDataset = datasetId;
             self.$broadcast("showMsg",{title:"Connexion au serveur",text:"Chargement des lieux en cours"});
             console.log("Get Places!! Dataset("+datasetId+")");
 
@@ -439,27 +500,56 @@ angular.module('appMain', ['ngSanitize'])
                 });
         };
 
+        // Toggle Mode
+        $scope.toggleMode = function(){
+            self.mode = (self.mode == "edit")?"read":"edit";
+            self.editMode = (self.mode == "edit")?true:false;
+        };
+
         // HTTP GET SINGLE PLACE
         $scope.getPlace = function(placeId){
             console.log("Get Places #"+placeId);
             var self = $scope;
-            //self.$broadcast("showMsg",{title:"Connexion au serveur",text:"Chargement des informations en cours"});
-            self.place = [];
 
-            $http.get("./places/"+placeId ).
-                success(function(data) {
-                    //console.log(status);
-                    //console.log(data);
-                    if(data.status == 200){
-                        self.$broadcast('newPlace', data);
-                    }
-                }).
-                error(function(data, status) {
-                    console.log(status);
-                    console.log(data);
-                    //$scope.data = data || "Request failed";
-                    $scope.status = status;
-                });
+            //self.$broadcast("showMsg",{title:"Connexion au serveur",text:"Chargement des informations en cours"});
+
+            self.place = [];
+            self.showDetails();
+            //console.log('TEST1');
+
+            // CACHE CHECK
+            //setTimeout(function(){
+                //console.log("ok");
+                if(self.placeDetailsCache['_'+placeId]){
+                    console.log("FROM CACHE");
+                    self.$broadcast('newPlace', self.placeDetailsCache['_'+placeId] );
+                }else{
+                    $http.get("./places/"+placeId ).
+                        success(function(data) {
+                            //console.log(status);
+                            //console.log(data);
+                            if(data.status == 200){
+                                self.placeDetailsCache['_'+placeId] = data;
+                                var data = data;
+                                setTimeout(
+                                    function(){
+                                        console.log('TRIGGER');
+                                        self.$broadcast('newPlace', data);
+                                    }
+                                    ,500);
+                                //self.$broadcast('newPlace', data);
+                            }
+                        }).
+                        error(function(data, status) {
+                            console.log(status);
+                            console.log(data);
+                            //$scope.data = data || "Request failed";
+                            //$scope.status = status;
+                        });
+                }
+
+            //},1000);
+
         };
 
         $scope.getCategories = function(){
@@ -492,67 +582,28 @@ angular.module('appMain', ['ngSanitize'])
                 self.geocoder = new google.maps.Geocoder();
             }
 
-
             var location = new google.maps.LatLng(self.place.location.latitude, self.place.location.longitude);
             self.geocoder.geocode( {'latLng': location}, function(results, status) {
 
                 if (status == google.maps.GeocoderStatus.OK) {
-                    //var lon = results[0].geometry.location.lng();
-                    //var lat = results[0].geometry.location.lat();
-                    var location_type = results[0].geometry.location_type;
-                    var address_components = results[0].address_components;
+
                     var formatted_address = results[0].formatted_address;
-                    var postal_code ="";
-                    var city = "";
-                    var street_number = "";
-                    var route = "";
+                    self.inverseGeocode = results[0];
 
-                    _.each(address_components, function(item){
-                        console.log(item.types[0] + " >> " + item.long_name);
-                        if( item.types[0] === "postal_code"){
-                            self.place.location.postal_code = item.long_name;
-                        }
-
-                        if( item.types[0] === "locality"){
-                            self.place.location.city = item.long_name;
-                        }
-
-                        if( item.types[0] === "street_number"){
-                            street_number = item.long_name;
-                        }
-
-                        if( item.types[0] === "route"){
-                            route = item.long_name;
-                        }
-                    });
-
-                    self.place.location.address = street_number + " " + route;
-                    self.place.location.service = "Google";
-                    self.place.location.location_type = location_type;
+                    self.modal.setTitle('Géocodage');
+                    var cHead = 'Géocodage Inverse disponible';
+                    self.modal.setContent({head:cHead,content:[formatted_address]});
+                    self.modal.target = self.montest;
+                    var btn = {
+                        target: self.processInverseGeododing,
+                        display: true,
+                        text: "Utiliser ces informations"
+                    };
+                    self.modal.btn = btn;
+                    self.modal.show();
                     self.safeApply();
-/*                    var location = {
 
-                        "location_type" : location_type,
-                        "formatted_address" : formatted_address,
-                        "postal_code" : postal_code,
-                        "city" : city,
-                        "service" : "Google"
-                    };*/
-                    //console.log(location);
-
-/*                    self.uData.features[targetRow].geometry.coordinates = [lon,lat];
-                    self.uData.features[targetRow]._geo = location;
-
-                    self.geoConsole = "ID:"+targetRow+" ["+adr+"] : ("+lon+","+lat+")";
-                    self.geoLog += "\n" + self.geoConsole;
-                    self.safeApply();
-                    timer = 800;
-                    self.geoIndex = pos;
-                    responseCount ++;
-                    pos ++;*/
-
-                } else
-                {
+                } else {
                     console.log(status);
                 }
             });
@@ -562,9 +613,92 @@ angular.module('appMain', ['ngSanitize'])
             $rootScope.$broadcast("geoLocation");
         }
 
+        $scope.showList = function(){
+            self.place_panel = "";
+            //self.safeApply();
+        }
+
+        $scope.showDetails = function(){
+            self.place_panel = "flipped";
+        }
+
+        $scope.addLocation = function(){
+            console.log("Add LOCATION !");
+
+            var place = {
+                id:"new",
+                location:{
+                    latitude:45.528293,
+                    longitude:-73.59246
+                },
+                categories:{
+                    primary_category:{},
+                    secondary_category:{}
+                },
+                tags:{}
+            };
+
+            // Tags
+            var dataset = _.find(self.datasets, function(item){ return self.selectedDataset == item.id; });
+            _.each(dataset.dataset_extra_fields, function(item){
+                place.tags[item.field] = "";
+            });
+
+            self.place = place;
+            self.places.push(place);
+            self.selectedCategorie = [];
+
+
+            //self.getMapCenter();
+            self.mode ="edit";
+            self.showDetails();
+        }
 
         $scope.getScope = function(){
             console.log($scope);
         }
 
+        $scope.processInverseGeododing = function () {
+            console.log("YES!!!!!!");
+
+            var invGeo = self.inverseGeocode;
+            var location_type = invGeo.geometry.location_type;
+            var address_components = invGeo.address_components;
+
+            var street_number = "";
+            var route = "";
+
+            _.each(address_components, function(item){
+                console.log(item.types[0] + " >> " + item.long_name);
+                if( item.types[0] === "postal_code"){
+                    self.place.location.postal_code = item.long_name;
+                }
+
+                if( item.types[0] === "locality"){
+                    self.place.location.city = item.long_name;
+                }
+
+                if( item.types[0] === "street_number"){
+                    street_number = item.long_name;
+                }
+
+                if( item.types[0] === "route"){
+                    route = item.long_name;
+                }
+            });
+
+            self.place.location.address = street_number + " " + route;
+            self.place.location.service = "Google";
+            self.place.location.location_type = location_type;
+            self.modal.hide();
+            self.safeApply();
+        };
+
+        //OBSERVERS
+        $scope.$watch('place_panel', function(newValue){
+            console.log("WATCHER > place_panel > " + newValue);
+            //console.log(newValue+ " <> " + oldValue);
+           // $scope.$broadcast("showMsg",{title:"Delay",text:"Chargement d'un lieu"},true);
+
+        });
     });

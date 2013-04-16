@@ -1,4 +1,4 @@
-function MapCtrl($rootScope, $scope, $filter, $http) {
+function MapCtrl($rootScope, $scope, $compile, $filter, $http) {
     $scope.test = "supreDUper";
     self = $scope;
     root = $rootScope;
@@ -26,8 +26,10 @@ function MapCtrl($rootScope, $scope, $filter, $http) {
         //console.log(self.map);
     });
 
-    $scope.$on('setMarkers', function ($scope, Places) {
-        //console.log($scope);
+    $scope.$on('setMarkers', function ($scope, oData) {
+        var Places = oData.Places;
+        var zoomToBounds = oData.zoomToBounds || false;
+        console.log(zoomToBounds);
         //console.log(Places);
         if (self.map.hasLayer(self.markers)) {
             self.map.removeLayer(self.markers);
@@ -44,28 +46,41 @@ function MapCtrl($rootScope, $scope, $filter, $http) {
 
         self.markers = new L.MarkerClusterGroup({showCoverageOnHover:false});
 
-        _.each(Places, function(element, index){
-            var title = element.name;
-            var marker = new L.Marker(new L.LatLng(element.location.latitude, element.location.longitude), { title:title });
-            marker.bindPopup(title);
+        _.each(Places, function(element){
+            var title = element.label;
+            var id = element.id;
+            var latlng = new L.LatLng(element.location.latitude, element.location.longitude);
+
+            var marker = new L.Marker(latlng, { title:title, latlng:latlng, id:id });
+            //marker.bindPopup(title);
             self.markers.addLayer(marker);
         });
 
         self.markers.on('click', function (a) {
-            console.log(a);
-            //$rootScope.$broadcast('setQueryById', {options:a.layer.options});
+
+            var point = new L.Point(0, -40);
+            var content = '<p>'+a.layer.options.title+'<br>';
+            content += '<test rel="'+a.layer.options.id+'"><a href="#" class="pseudo-btn"><span class="label">Afficher la fiche détaillée</span></a></test>';
+            content += '</p>';
+            var popup = L.popup({offset:point})
+                .setLatLng(a.layer.options.latlng)
+                .setContent(content)
+                .openOn(self.map);
+
+            $compile($(".leaflet-popup-content"))(self);
         });
 
         self.markers.on('clusterclick', function (a) {
-            _.each(a.layer.getAllChildMarkers(), function (element, index, list) {
+/*            _.each(a.layer.getAllChildMarkers(), function (element, index, list) {
                 //console.log(element.options.title );
-            });
+            });*/
         });
 
         self.map.addLayer(self.markers);
 
-        if (_.size(self.markers._layers) > 0) {
-
+        // Zoom to bounds
+        if ( (_.size(self.markers._layers) > 0) && zoomToBounds){
+            console.log('ZOOM TO BOUNDS');
             var t_bounds = [];
             _.each(self.markers._layers, function (element, index, list) {
 
@@ -81,6 +96,7 @@ function MapCtrl($rootScope, $scope, $filter, $http) {
                     self.map.fitBounds(bounds);
                 }
             }
+
         }
 
         root.$broadcast("marked");
@@ -100,11 +116,18 @@ function MapCtrl($rootScope, $scope, $filter, $http) {
         self.map.stopLocate();
         var locate = self.map.locate({
             setView: true,
-            maxZoom: 18//,
-            //maximumAge: 3000,
-            //enableHighAccuracy: true//,
-            //watch: true
+            maxZoom: 18,
+            maximumAge: 3000,
+            enableHighAccuracy: true,
+            watch: true
         });
         console.log(locate);
     });
+
+    $scope.showDetails = function(id){
+        console.log("test");
+        console.log(id);
+        console.log(arguments);
+        $rootScope.$broadcast("markerShowDetails", {id:id});
+    }
 }

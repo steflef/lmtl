@@ -47,8 +47,10 @@
         <?endif;?>
     </script>
 
-    <script type="text/javascript" src="//code.angularjs.org/1.0.1/angular-1.0.1.min.js"></script>
-    <script type="text/javascript" src="http://code.angularjs.org/1.0.1/angular-sanitize-1.0.1.min.js"></script>
+    <!--<script type="text/javascript" src="//code.angularjs.org/1.0.1/angular-1.0.1.min.js"></script>-->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.4/angular.min.js"></script>
+    <script type="text/javascript" src="http://code.angularjs.org/1.0.6/angular-sanitize.min.js"></script>
+    <!--<script type="text/javascript" src="http://code.angularjs.org/1.0.1/angular-sanitize-1.0.1.min.js"></script>-->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script type="text/javascript" src="//documentcloud.github.com/underscore/underscore-min.js"></script>
     <script type="text/javascript" src="./public/js/ng/ctrl/map.js"></script>
